@@ -9,6 +9,8 @@
 #ifndef rawproc_jpeg_h
 #define rawproc_jpeg_h
 
+
+
 typedef  unsigned short ushort;
 typedef unsigned char uchar;
 typedef long long INT64;
@@ -26,12 +28,15 @@ private:
     unsigned zero_after_ff;
     unsigned dng_version;
     struct jhead* jh;
-    struct jhead jhactual;
-    const char* _data;
+    
+    const unsigned char* _data;
     int _size;
     int _pos;
+    const int SeekCur;
 public:
-    ljpeg(const char* data, int size);
+    struct jhead jhactual;
+    
+    ljpeg(const unsigned char* data, int size);
     void fread(unsigned char* data, int m, int n);
     unsigned int fgetc();
     unsigned int getc();

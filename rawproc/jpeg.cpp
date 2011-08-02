@@ -1,43 +1,44 @@
 #include <string.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <sys/types.h>
+#include <iostream>
 
 #include "jpeg.h"
 
-const int SEEK_CUR = 0;
+
 
 #define FORC(cnt) for (c=0; c < cnt; c++)
 #define FORC3 FORC(3)
 #define FORC4 FORC(4)
 #define FORCC FORC(colors)
 
-#define EOF -1
 
 
-
-
-ljpeg::ljpeg(const char* data, int size) {
-        jh = &jhactual;
-        _data = data;
-        _size = size;
-    }
+ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
+    jh = &jhactual;
+    _data = data;
+    _size = size;
+    _pos = 0;
+}
     
     void ljpeg::fread(unsigned char* data, int m, int n) {
+        int dst = 0;
         for(int i = 0; i<n; i++) {
+            
             int cp = m;
             if(_pos + cp >= _size) {
                 cp = _size - _pos;
             }
             
-            memcpy(data, &_data[_pos], cp);
+            memcpy(data+dst, _data+_pos, cp);
             _pos += cp;
+            dst += cp;
             if(_pos > _size) return;
         }
     }
     
     unsigned int ljpeg::fgetc() {
-        if(_pos >= _size) return EOF;
+        if(_pos >= _size) {
+            return EOF;
+        }
         
         return _data[_pos++];
     }
@@ -70,6 +71,7 @@ ljpeg::ljpeg(const char* data, int size) {
             c = (uchar) huff[c];
         } else
             vbits -= nbits;
+        
         if (vbits < 0) throw "Vbits was 0";
         return c;
     }
@@ -103,12 +105,15 @@ ljpeg::ljpeg(const char* data, int size) {
         uchar data[0x10000];
         const uchar *dp;
         
+                
         memset (jh, 0, sizeof *jh);
         jh->restart = INT_MAX;
         fread (data, 2, 1);
         if (data[1] != 0xd8) return 0;
+        
         do {
             fread (data, 2, 2);
+            
             tag =  data[0] << 8 | data[1];
             len = (data[2] << 8 | data[3]) - 2;
             if (tag <= 0xff00) return 0;
@@ -165,6 +170,7 @@ ljpeg::ljpeg(const char* data, int size) {
         int len, diff;
         
         len = gethuff(huff);
+        
         if (len == 16 && (!dng_version || dng_version >= 0x1010000))
             return -32768;
         diff = getbits(len);
@@ -177,16 +183,20 @@ ljpeg::ljpeg(const char* data, int size) {
     {
         int col, c, diff, pred, spred=0;
         ushort mark=0, *row[3];
+    
+        
         
         if (jrow * jh->wide % jh->restart == 0) {
             FORC(6) jh->vpred[c] = 1 << (jh->bits-1);
             if (jrow) {
+                
                 fseek (-2, SEEK_CUR);
                 do mark = (mark << 8) + (c = fgetc());
                 while (c != EOF && mark >> 4 != 0xffd);
             }
             getbits(-1);
         }
+        
         FORC3 row[c] = jh->row + jh->wide*jh->clrs*((jrow+c) & 1);
         for (col=0; col < jh->wide; col++)
             FORC(jh->clrs) {
@@ -209,6 +219,7 @@ ljpeg::ljpeg(const char* data, int size) {
                 if (c <= jh->sraw) spred = **row;
                 row[0]++; row[1]++;
             }
+                    
         return row[2];
     }
 

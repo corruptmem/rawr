@@ -127,20 +127,82 @@ public:
         file.seekg(strip_offset, std::ios_base::beg);
         file.read(raw_buf, strip_byte_counts);
         
-        ljpeg jp(raw_buf, strip_byte_counts);
+        std::cout << "!!!" << std::endl;
+        ljpeg jp((unsigned char*)raw_buf, strip_byte_counts);
         jp.start(0);
+        //----------
         
-        std::cout << strip_byte_counts << std::endl;
+        int jwide = jp.jhactual.wide * jp.jhactual.clrs;
+        ushort *rp;
+        std::ofstream out("/tmp/out.pgm");
+        std::cout<<jp.jhactual.wide<<std::endl;
+        std::cout<<"First count: "<<slices.num_first_strips<<std::endl;
+        std::cout<<"First strip px: "<<slices.first_strip_px<<std::endl;
+        std::cout<<"Last strip px: "<<slices.last_strip_px<<std::endl;
         
-        std::cout << "Done" << std::endl;
+        out<<"P5"<<std::endl;
+        int w = 1728;
+        int h = (jp.jhactual.high*jp.jhactual.wide)/w;
+        int total = w*h;
+        //out<<"1336"<<std::endl;
+        out<<w<<std::endl;
+        out<<h<<std::endl;
+        //out<<"3516"<<std::endl;
+        out<<"65535"<<std::endl;
+        
+        std::cout<<total<<std::endl;
+        int i = 0;
+        
+        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
+            rp = jp.row(jrow);
+        
+            
+            for(int px = 0; px<jp.jhactual.wide; px++) {
+                unsigned char c1;
+                unsigned char c2;
+                
+                c2 = (unsigned char)(rp[px] & 0xFF);
+                c1 = (unsigned char)((rp[px] & 0xFF00)>>8);
+                
+                out.put(c1);
+                out.put(c2);
+                
+                i++;
+                if(i>total) {
+                    break;
+                }
+            }
+            
+            if(i>total) {
+                break;
+            }
+            
+            //std::cout<<jrow<<std::endl;
+        }
+        
+            
+            
+            //--------
+        jp.end();
+        /*jp.end();*/
+        
+        out.close();
+        
+        
+        std::cout << "Done"  << std::endl;
     }
 };
 
 int main (int argc, const char * argv[])
 {
-    const char* file_path = "/Users/cameron/camraw/test.cr2";
-    Cr2Parser parser(file_path);
-    parser.Parse();
+    try {
+        const char* file_path = "/Users/cameron/camraw/test.cr2";
+        Cr2Parser parser(file_path);
+        parser.Parse();
+    } catch (const char* str) {
+        std::cout<<str<<std::endl;
+    }
+
     
     
     return 0;
