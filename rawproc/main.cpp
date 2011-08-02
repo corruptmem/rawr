@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "jpeg.h"
+
 struct Cr2Header {
     uint16_t byte_order;
     uint16_t magic_word;
@@ -124,6 +126,9 @@ public:
         char* raw_buf = new char[strip_byte_counts];
         file.seekg(strip_offset, std::ios_base::beg);
         file.read(raw_buf, strip_byte_counts);
+        
+        ljpeg jp(raw_buf, strip_byte_counts);
+        jp.start(0);
         
         std::cout << strip_byte_counts << std::endl;
         

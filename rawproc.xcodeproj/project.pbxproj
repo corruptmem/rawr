@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7EB8427413E871020030F035 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8427313E871020030F035 /* main.cpp */; };
 		7EB8427613E871020030F035 /* rawproc.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EB8427513E871020030F035 /* rawproc.1 */; };
+		7EB8427F13E88C2A0030F035 /* libjpeg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB8427E13E88C2A0030F035 /* libjpeg.dylib */; };
+		7EB8428113E88E4A0030F035 /* jpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8428013E88E4A0030F035 /* jpeg.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +30,9 @@
 		7EB8426F13E871020030F035 /* rawproc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rawproc; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EB8427313E871020030F035 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7EB8427513E871020030F035 /* rawproc.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = rawproc.1; sourceTree = "<group>"; };
+		7EB8427E13E88C2A0030F035 /* libjpeg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.dylib; path = usr/local/lib/libjpeg.dylib; sourceTree = SDKROOT; };
+		7EB8428013E88E4A0030F035 /* jpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jpeg.cpp; sourceTree = "<group>"; };
+		7EB8428213E895530030F035 /* jpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpeg.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EB8427F13E88C2A0030F035 /* libjpeg.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +50,7 @@
 		7EB8426413E871020030F035 = {
 			isa = PBXGroup;
 			children = (
+				7EB8427E13E88C2A0030F035 /* libjpeg.dylib */,
 				7EB8427213E871020030F035 /* rawproc */,
 				7EB8427013E871020030F035 /* Products */,
 			);
@@ -62,6 +69,8 @@
 			children = (
 				7EB8427313E871020030F035 /* main.cpp */,
 				7EB8427513E871020030F035 /* rawproc.1 */,
+				7EB8428013E88E4A0030F035 /* jpeg.cpp */,
+				7EB8428213E895530030F035 /* jpeg.h */,
 			);
 			path = rawproc;
 			sourceTree = "<group>";
@@ -117,6 +126,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EB8427413E871020030F035 /* main.cpp in Sources */,
+				7EB8428113E88E4A0030F035 /* jpeg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,6 +181,8 @@
 		7EB8427A13E871020030F035 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -178,6 +190,8 @@
 		7EB8427B13E871020030F035 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
