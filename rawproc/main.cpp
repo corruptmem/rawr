@@ -133,6 +133,7 @@ public:
         //----------
         
         int jwide = jp.jhactual.wide * jp.jhactual.clrs;
+        std::cout<<jwide<<std::endl;
         ushort *rp;
         std::ofstream out("/tmp/out.pgm");
         std::cout<<jp.jhactual.wide<<std::endl;
@@ -140,10 +141,153 @@ public:
         std::cout<<"First strip px: "<<slices.first_strip_px<<std::endl;
         std::cout<<"Last strip px: "<<slices.last_strip_px<<std::endl;
         
+    
+        
+        
+        int h = 3516;
+        int w = 5344;
+        
+        int j_h = jp.jhactual.high;
+        int j_w = jp.jhactual.wide;
+        int j_c = 4;
+        
+        std::cout<<"j_w: "<<j_w<<std::endl;
+        std::cout<<"j_h: "<<j_h<<std::endl;
+        
+        /*
         out<<"P5"<<std::endl;
+        out<<432<<std::endl;
+        out<<3516<<std::endl;
+        out<<"65535"<<std::endl;
+        
+        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
+            rp = jp.row(jrow);
+            for(int px_c = 0; px_c<j_w*j_c; px_c+=4) {
+                
+                
+                out.put((unsigned char)(rp[px_c] & 0xFF));
+                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
+                
+                out.put((unsigned char)(rp[px_c] & 0xFF));
+                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
+                
+                out.put((unsigned char)(rp[px_c] & 0xFF));
+                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
+                
+                out.put((unsigned char)(rp[px_c] & 0xFF));
+                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
+                
+                
+                out.put((unsigned char)(rp[px_c+1] & 0xFF));
+                out.put((unsigned char)((rp[px_c+1] & 0xFF00)>>8));
+                
+                out.put((unsigned char)(rp[px_c+2] & 0xFF));
+                out.put((unsigned char)((rp[px_c+2] & 0xFF00)>>8));
+                
+                out.put((unsigned char)0);
+                out.put((unsigned char)0);
+                
+                out.put((unsigned char)0);
+                out.put((unsigned char)0);
+                
+                out.put((unsigned char)0);
+                out.put((unsigned char)0);*/
+                
+                //out.put((unsigned char)(rp[px_c+3] & 0xFF));
+                //out.put((unsigned char)((rp[px_c+3] & 0xFF00)>>8));
+                
+                //raw_px[j_w*jrow+px_c] = rp[px_c];
+        /*
+            }
+        }*/
+        
+        uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
+        /*
+        out<<"P5"<<std::endl;
+        out<<w<<std::endl;
+        out<<h<<std::endl;
+        out<<"65535"<<std::endl;*/
+                        
+        std::cout<<"x_"<<jp.jhactual.high<<std::endl;
+        std::cout<<"y_"<<j_w<<std::endl;
+        
+        int next = 0;
+        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
+            rp = jp.row(jrow);
+            for(int px_c = 0; px_c<j_w*j_c; px_c++) {
+                raw_px[next++] = rp[px_c];
+             
+                //out.put((unsigned char)((raw_px[j_w*jrow+px_c] & 0xFF)>>0));
+                //out.put((unsigned char)((raw_px[j_w*jrow+px_c] & 0xFF00)>>8));
+            }
+        }
+        
+        
+        next = 0;
+        uint16_t* pixels = new uint16_t[w*h];
+        
+        for(int i = 0; i<w*h; i++) pixels[i] = 0;
+        
+        std::cout<<"slices.first_strip_px: "<<slices.first_strip_px<<std::endl;
+        
+        for(int strip_i = 0; strip_i<slices.num_first_strips+1; strip_i++) {
+            for(int y = 0; y<h; y++) {
+                for(int x = 0; x<(strip_i==slices.num_first_strips?slices.last_strip_px:slices.first_strip_px); x+=4) {
+                    //pixels[y*w+x+slices.first_strip_px*strip_i] = raw_px[j_w*y+x*j_c];
+                    pixels[y*w+x+slices.first_strip_px*strip_i] = raw_px[next];
+                    pixels[y*w+x+slices.first_strip_px*strip_i+1] = raw_px[next+1];
+                    pixels[y*w+x+slices.first_strip_px*strip_i+2] = raw_px[next+2];
+                    pixels[y*w+x+slices.first_strip_px*strip_i+3] = raw_px[next+3];
+                    
+                    next+=4;
+                }
+            }
+        }
+        
+    
+        
+        out<<"P5"<<std::endl;
+        out<<w<<std::endl;
+        out<<h<<std::endl;
+        out<<"65535"<<std::endl;
+        
+        for(int i = 0; i<w*h; i++) {
+            unsigned char c1;
+            unsigned char c2;
+            
+            c2 = (unsigned char)(pixels[i] & 0xFF);
+            c1 = (unsigned char)((pixels[i] & 0xFF00)>>8);
+            
+            out.put(c1);
+            out.put(c2);
+        }
+        
+        /*
+        int cur = 0;
+        
+        for(int y = 0; y<h; y++)
+            for(int x = 0; x<432; x++) {
+                unsigned char c1;
+                unsigned char c2;
+                
+                c2 = (unsigned char)(raw_px[cur] & 0xFF);
+                c1 = (unsigned char)((raw_px[cur] & 0xFF00)>>8);
+                
+                out.put(c1);
+                out.put(c2);
+                
+                cur += 4;
+            }
+        */
+        
+        
+        /*
+        out<<"P5"<<std::endl;
+        
         int w = 1728;
+        int w = 432; // strip width
         int h = (jp.jhactual.high*jp.jhactual.wide)/w;
-        int total = w*h;
+        int total = w*h*4;
         //out<<"1336"<<std::endl;
         out<<w<<std::endl;
         out<<h<<std::endl;
@@ -158,18 +302,20 @@ public:
         
             
             for(int px = 0; px<jp.jhactual.wide; px++) {
-                unsigned char c1;
-                unsigned char c2;
-                
-                c2 = (unsigned char)(rp[px] & 0xFF);
-                c1 = (unsigned char)((rp[px] & 0xFF00)>>8);
-                
-                out.put(c1);
-                out.put(c2);
-                
-                i++;
-                if(i>total) {
-                    break;
+                for(int c = 0; c<1; c++) {
+                    unsigned char c1;
+                    unsigned char c2;
+                    
+                    c2 = (unsigned char)(rp[px*4+c] & 0xFF);
+                    c1 = (unsigned char)((rp[px*4+c] & 0xFF00)>>8);
+                    
+                    out.put(c1);
+                    out.put(c2);
+                    
+                    i++;
+                    if(i>total) {
+                        break;
+                    }
                 }
             }
             
@@ -179,7 +325,7 @@ public:
             
             //std::cout<<jrow<<std::endl;
         }
-        
+        */
             
             
             //--------
