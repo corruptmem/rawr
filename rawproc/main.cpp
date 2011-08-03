@@ -135,7 +135,6 @@ public:
         int jwide = jp.jhactual.wide * jp.jhactual.clrs;
         std::cout<<jwide<<std::endl;
         ushort *rp;
-        std::ofstream out("/tmp/out.pgm");
         std::cout<<jp.jhactual.wide<<std::endl;
         std::cout<<"First count: "<<slices.num_first_strips<<std::endl;
         std::cout<<"First strip px: "<<slices.first_strip_px<<std::endl;
@@ -154,59 +153,7 @@ public:
         std::cout<<"j_w: "<<j_w<<std::endl;
         std::cout<<"j_h: "<<j_h<<std::endl;
         
-        /*
-        out<<"P5"<<std::endl;
-        out<<432<<std::endl;
-        out<<3516<<std::endl;
-        out<<"65535"<<std::endl;
-        
-        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
-            rp = jp.row(jrow);
-            for(int px_c = 0; px_c<j_w*j_c; px_c+=4) {
-                
-                
-                out.put((unsigned char)(rp[px_c] & 0xFF));
-                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
-                
-                out.put((unsigned char)(rp[px_c] & 0xFF));
-                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
-                
-                out.put((unsigned char)(rp[px_c] & 0xFF));
-                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
-                
-                out.put((unsigned char)(rp[px_c] & 0xFF));
-                out.put((unsigned char)((rp[px_c] & 0xFF00)>>8));
-                
-                
-                out.put((unsigned char)(rp[px_c+1] & 0xFF));
-                out.put((unsigned char)((rp[px_c+1] & 0xFF00)>>8));
-                
-                out.put((unsigned char)(rp[px_c+2] & 0xFF));
-                out.put((unsigned char)((rp[px_c+2] & 0xFF00)>>8));
-                
-                out.put((unsigned char)0);
-                out.put((unsigned char)0);
-                
-                out.put((unsigned char)0);
-                out.put((unsigned char)0);
-                
-                out.put((unsigned char)0);
-                out.put((unsigned char)0);*/
-                
-                //out.put((unsigned char)(rp[px_c+3] & 0xFF));
-                //out.put((unsigned char)((rp[px_c+3] & 0xFF00)>>8));
-                
-                //raw_px[j_w*jrow+px_c] = rp[px_c];
-        /*
-            }
-        }*/
-        
         uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
-        /*
-        out<<"P5"<<std::endl;
-        out<<w<<std::endl;
-        out<<h<<std::endl;
-        out<<"65535"<<std::endl;*/
                         
         std::cout<<"x_"<<jp.jhactual.high<<std::endl;
         std::cout<<"y_"<<j_w<<std::endl;
@@ -221,6 +168,7 @@ public:
                 //out.put((unsigned char)((raw_px[j_w*jrow+px_c] & 0xFF00)>>8));
             }
         }
+        jp.end();
         
         
         next = 0;
@@ -245,7 +193,7 @@ public:
         }
         
     
-        
+        std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
         out<<w<<std::endl;
         out<<h<<std::endl;
@@ -262,77 +210,100 @@ public:
             out.put(c2);
         }
         
+        std::ofstream composite("/tmp/composite.ppm");
+        composite<<"P6"<<std::endl;
+        composite<<w/2<<std::endl;
+        composite<<h/2<<std::endl;
+        composite<<"65535"<<std::endl;
+        
+        for(int y = 0; y<h; y+=2)
+            for(int x = 0; x<w; x+=2) {
+                // red
+                composite.put((unsigned char)((pixels[(y+1)*w+x] & 0xFF00)>>8));
+                composite.put((unsigned char)(pixels[(y+1)*w+x] & 0xFF));
+                
+                // green
+                composite.put((unsigned char)((pixels[y*w+x] & 0xFF00)>>8));
+                composite.put((unsigned char)(pixels[w*y+x] & 0xFF));
+                
+                // blue
+                composite.put((unsigned char)((pixels[y*w+(x+1)] & 0xFF00)>>8));
+                composite.put((unsigned char)(pixels[w*y+(x+1)] & 0xFF));
+                
+            }
+        
+        
         /*
-        int cur = 0;
+        std::ofstream green("/tmp/blue.pgm");
+        green<<"P5"<<std::endl;
+        green<<w/2<<std::endl;
+        green<<h/2<<std::endl;
+        green<<"65535"<<std::endl;
         
         for(int y = 0; y<h; y++)
-            for(int x = 0; x<432; x++) {
+            for(int x = 0; x<w; x++) {
+                if(!(y%2==0 && x%2==1)) continue;
+
                 unsigned char c1;
                 unsigned char c2;
                 
-                c2 = (unsigned char)(raw_px[cur] & 0xFF);
-                c1 = (unsigned char)((raw_px[cur] & 0xFF00)>>8);
+                c2 = (unsigned char)(pixels[w*y+x] & 0xFF);
+                c1 = (unsigned char)((pixels[y*w+x] & 0xFF00)>>8);
                 
-                out.put(c1);
-                out.put(c2);
+                green.put(c1);
+                green.put(c2);
+            }
+        
+        std::ofstream red("/tmp/green.pgm");
+        red<<"P5"<<std::endl;
+        red<<w/2<<std::endl;
+        red<<h/2<<std::endl;
+        red<<"65535"<<std::endl;
+        
+        for(int y = 0; y<h; y++)
+            for(int x = 0; x<w; x++) {
+                if(!(y%2==0 && x%2==0)) continue;
                 
-                cur += 4;
+                unsigned char c1;
+                unsigned char c2;
+                
+                c2 = (unsigned char)(pixels[w*y+x] & 0xFF);
+                c1 = (unsigned char)((pixels[y*w+x] & 0xFF00)>>8);
+                
+                red.put(c1);
+                red.put(c2);
             }
         */
+        std::ofstream red("/tmp/red.pgm");
+        red<<"P5"<<std::endl;
+        red<<w/2<<std::endl;
+        red<<h/2<<std::endl;
+        red<<"65535"<<std::endl;
+        //red<<"4294967295"<<std::endl;
         
-        
-        /*
-        out<<"P5"<<std::endl;
-        
-        int w = 1728;
-        int w = 432; // strip width
-        int h = (jp.jhactual.high*jp.jhactual.wide)/w;
-        int total = w*h*4;
-        //out<<"1336"<<std::endl;
-        out<<w<<std::endl;
-        out<<h<<std::endl;
-        //out<<"3516"<<std::endl;
-        out<<"65535"<<std::endl;
-        
-        std::cout<<total<<std::endl;
-        int i = 0;
-        
-        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
-            rp = jp.row(jrow);
-        
-            
-            for(int px = 0; px<jp.jhactual.wide; px++) {
-                for(int c = 0; c<1; c++) {
-                    unsigned char c1;
-                    unsigned char c2;
-                    
-                    c2 = (unsigned char)(rp[px*4+c] & 0xFF);
-                    c1 = (unsigned char)((rp[px*4+c] & 0xFF00)>>8);
-                    
-                    out.put(c1);
-                    out.put(c2);
-                    
-                    i++;
-                    if(i>total) {
-                        break;
-                    }
-                }
+        for(int y = 0; y<h; y++)
+            for(int x = 0; x<w; x++) {
+                if(!(y%2==1 && x%2==0)) continue;
+                
+                unsigned char c1;
+                unsigned char c2;
+                
+                int px = pixels[w*y+x] * 4;
+                
+                c2 = (unsigned char)(px & 0xFF);
+                c1 = (unsigned char)((px & 0xFF00)>>8);
+                
+               // red.put((unsigned char)0);
+               // red.put((unsigned char)0);
+                red.put(c1);
+                red.put(c2);
             }
-            
-            if(i>total) {
-                break;
-            }
-            
-            //std::cout<<jrow<<std::endl;
-        }
-        */
-            
-            
-            //--------
-        jp.end();
-        /*jp.end();*/
         
         out.close();
+        composite.close();
+        //green.close();
+        //red.close();
+        red.close();
         
         
         std::cout << "Done"  << std::endl;
@@ -342,7 +313,7 @@ public:
 int main (int argc, const char * argv[])
 {
     try {
-        const char* file_path = "/Users/cameron/camraw/test.cr2";
+        const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/07/23/20110723-203953/_MG_1846.CR2";
         Cr2Parser parser(file_path);
         parser.Parse();
     } catch (const char* str) {
