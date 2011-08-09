@@ -127,22 +127,12 @@ public:
         file.seekg(strip_offset, std::ios_base::beg);
         file.read(raw_buf, strip_byte_counts);
         
-        std::cout << "!!!" << std::endl;
         ljpeg jp((unsigned char*)raw_buf, strip_byte_counts);
         jp.start(0);
         //----------
         
-        int jwide = jp.jhactual.wide * jp.jhactual.clrs;
-        std::cout<<jwide<<std::endl;
         ushort *rp;
-        std::cout<<jp.jhactual.wide<<std::endl;
-        std::cout<<"First count: "<<slices.num_first_strips<<std::endl;
-        std::cout<<"First strip px: "<<slices.first_strip_px<<std::endl;
-        std::cout<<"Last strip px: "<<slices.last_strip_px<<std::endl;
-        
     
-        
-        
         int h = 3516;
         int w = 5344;
         
@@ -150,22 +140,13 @@ public:
         int j_w = jp.jhactual.wide;
         int j_c = 4;
         
-        std::cout<<"j_w: "<<j_w<<std::endl;
-        std::cout<<"j_h: "<<j_h<<std::endl;
-        
         uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
-                        
-        std::cout<<"x_"<<jp.jhactual.high<<std::endl;
-        std::cout<<"y_"<<j_w<<std::endl;
         
         int next = 0;
         for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
             rp = jp.row(jrow);
             for(int px_c = 0; px_c<j_w*j_c; px_c++) {
                 raw_px[next++] = rp[px_c];
-             
-                //out.put((unsigned char)((raw_px[j_w*jrow+px_c] & 0xFF)>>0));
-                //out.put((unsigned char)((raw_px[j_w*jrow+px_c] & 0xFF00)>>8));
             }
         }
         jp.end();
@@ -175,8 +156,6 @@ public:
         uint16_t* pixels = new uint16_t[w*h];
         
         for(int i = 0; i<w*h; i++) pixels[i] = 0;
-        
-        std::cout<<"slices.first_strip_px: "<<slices.first_strip_px<<std::endl;
         
         for(int strip_i = 0; strip_i<slices.num_first_strips+1; strip_i++) {
             for(int y = 0; y<h; y++) {
@@ -192,7 +171,17 @@ public:
             }
         }
         
-    
+        double f_number = 8;
+        double exposure = 1/500;
+        double iso = 100;
+        double q = 0.65; // http://en.wikipedia.org/wiki/Film_speed
+        
+        
+        for(int i = 0; i<w*h; i++) {
+            
+        }
+        
+        /*
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
         out<<w<<std::endl;
@@ -210,101 +199,28 @@ public:
             out.put(c2);
         }
         
-        std::ofstream composite("/tmp/composite.ppm");
-        composite<<"P6"<<std::endl;
-        composite<<w/2<<std::endl;
-        composite<<h/2<<std::endl;
-        composite<<"65535"<<std::endl;
-        
-        for(int y = 0; y<h; y+=2)
-            for(int x = 0; x<w; x+=2) {
-                // red
-                composite.put((unsigned char)((pixels[(y+1)*w+x] & 0xFF00)>>8));
-                composite.put((unsigned char)(pixels[(y+1)*w+x] & 0xFF));
-                
-                // green
-                composite.put((unsigned char)((pixels[y*w+x] & 0xFF00)>>8));
-                composite.put((unsigned char)(pixels[w*y+x] & 0xFF));
-                
-                // blue
-                composite.put((unsigned char)((pixels[y*w+(x+1)] & 0xFF00)>>8));
-                composite.put((unsigned char)(pixels[w*y+(x+1)] & 0xFF));
-                
-            }
+        out.close();*/
         
         
-        /*
-        std::ofstream green("/tmp/blue.pgm");
-        green<<"P5"<<std::endl;
-        green<<w/2<<std::endl;
-        green<<h/2<<std::endl;
-        green<<"65535"<<std::endl;
+    /*
+        std::ofstream out("/tmp/out.pgm");
+        out<<"P5"<<std::endl;
+        out<<w<<std::endl;
+        out<<h<<std::endl;
+        out<<"65535"<<std::endl;
         
-        for(int y = 0; y<h; y++)
-            for(int x = 0; x<w; x++) {
-                if(!(y%2==0 && x%2==1)) continue;
-
-                unsigned char c1;
-                unsigned char c2;
-                
-                c2 = (unsigned char)(pixels[w*y+x] & 0xFF);
-                c1 = (unsigned char)((pixels[y*w+x] & 0xFF00)>>8);
-                
-                green.put(c1);
-                green.put(c2);
-            }
+        for(int i = 0; i<w*h; i++) {
+            unsigned char c1;
+            unsigned char c2;
+            
+            c2 = (unsigned char)(pixels[i] & 0xFF);
+            c1 = (unsigned char)((pixels[i] & 0xFF00)>>8);
+            
+            out.put(c1);
+            out.put(c2);
+        }
         
-        std::ofstream red("/tmp/green.pgm");
-        red<<"P5"<<std::endl;
-        red<<w/2<<std::endl;
-        red<<h/2<<std::endl;
-        red<<"65535"<<std::endl;
-        
-        for(int y = 0; y<h; y++)
-            for(int x = 0; x<w; x++) {
-                if(!(y%2==0 && x%2==0)) continue;
-                
-                unsigned char c1;
-                unsigned char c2;
-                
-                c2 = (unsigned char)(pixels[w*y+x] & 0xFF);
-                c1 = (unsigned char)((pixels[y*w+x] & 0xFF00)>>8);
-                
-                red.put(c1);
-                red.put(c2);
-            }
-        */
-        std::ofstream red("/tmp/red.pgm");
-        red<<"P5"<<std::endl;
-        red<<w/2<<std::endl;
-        red<<h/2<<std::endl;
-        red<<"65535"<<std::endl;
-        //red<<"4294967295"<<std::endl;
-        
-        for(int y = 0; y<h; y++)
-            for(int x = 0; x<w; x++) {
-                if(!(y%2==1 && x%2==0)) continue;
-                
-                unsigned char c1;
-                unsigned char c2;
-                
-                int px = pixels[w*y+x] * 4;
-                
-                c2 = (unsigned char)(px & 0xFF);
-                c1 = (unsigned char)((px & 0xFF00)>>8);
-                
-               // red.put((unsigned char)0);
-               // red.put((unsigned char)0);
-                red.put(c1);
-                red.put(c2);
-            }
-        
-        out.close();
-        composite.close();
-        //green.close();
-        //red.close();
-        red.close();
-        
+        out.close();*/
         
         std::cout << "Done"  << std::endl;
     }
@@ -319,8 +235,6 @@ int main (int argc, const char * argv[])
     } catch (const char* str) {
         std::cout<<str<<std::endl;
     }
-
-    
     
     return 0;
 }
