@@ -346,8 +346,8 @@ public:
 int main (int argc, const char * argv[])
 {
     try {
-        //const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/08/09/20110809-211100/_MG_2038.CR2";
-        const char* file_path = "/Users/cameron/Pictures/2011_08_09/_MG_2102.CR2";
+        const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/08/09/20110809-211100/_MG_2038.CR2";
+        //const char* file_path = "/Users/cameron/Pictures/2011_08_09/_MG_2102.CR2";
         Cr2Parser parser(file_path);
         parser.Parse();
     } catch (const char* str) {
