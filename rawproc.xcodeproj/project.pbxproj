@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E0CF0CD13F1D229004ED14F /* BigInteger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7E0CF0C813F1D229004ED14F /* BigInteger.cc */; };
+		7E0CF0CE13F1D229004ED14F /* BigIntegerAlgorithms.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7E0CF0C913F1D229004ED14F /* BigIntegerAlgorithms.cc */; };
+		7E0CF0CF13F1D229004ED14F /* BigIntegerUtils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7E0CF0CA13F1D229004ED14F /* BigIntegerUtils.cc */; };
+		7E0CF0D013F1D229004ED14F /* BigUnsigned.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7E0CF0CB13F1D229004ED14F /* BigUnsigned.cc */; };
+		7E0CF0D113F1D229004ED14F /* BigUnsignedInABase.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7E0CF0CC13F1D229004ED14F /* BigUnsignedInABase.cc */; };
 		7EB8427413E871020030F035 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8427313E871020030F035 /* main.cpp */; };
 		7EB8427613E871020030F035 /* rawproc.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EB8427513E871020030F035 /* rawproc.1 */; };
 		7EB8427F13E88C2A0030F035 /* libjpeg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EB8427E13E88C2A0030F035 /* libjpeg.dylib */; };
@@ -27,6 +32,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7E0CF0C113F1D229004ED14F /* BigInteger.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigInteger.hh; sourceTree = "<group>"; };
+		7E0CF0C213F1D229004ED14F /* BigIntegerAlgorithms.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigIntegerAlgorithms.hh; sourceTree = "<group>"; };
+		7E0CF0C313F1D229004ED14F /* BigIntegerLibrary.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigIntegerLibrary.hh; sourceTree = "<group>"; };
+		7E0CF0C413F1D229004ED14F /* BigIntegerUtils.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigIntegerUtils.hh; sourceTree = "<group>"; };
+		7E0CF0C513F1D229004ED14F /* BigUnsigned.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigUnsigned.hh; sourceTree = "<group>"; };
+		7E0CF0C613F1D229004ED14F /* BigUnsignedInABase.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BigUnsignedInABase.hh; sourceTree = "<group>"; };
+		7E0CF0C713F1D229004ED14F /* NumberlikeArray.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = NumberlikeArray.hh; sourceTree = "<group>"; };
+		7E0CF0C813F1D229004ED14F /* BigInteger.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigInteger.cc; sourceTree = "<group>"; };
+		7E0CF0C913F1D229004ED14F /* BigIntegerAlgorithms.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigIntegerAlgorithms.cc; sourceTree = "<group>"; };
+		7E0CF0CA13F1D229004ED14F /* BigIntegerUtils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigIntegerUtils.cc; sourceTree = "<group>"; };
+		7E0CF0CB13F1D229004ED14F /* BigUnsigned.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigUnsigned.cc; sourceTree = "<group>"; };
+		7E0CF0CC13F1D229004ED14F /* BigUnsignedInABase.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigUnsignedInABase.cc; sourceTree = "<group>"; };
 		7EB8426F13E871020030F035 /* rawproc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rawproc; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EB8427313E871020030F035 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7EB8427513E871020030F035 /* rawproc.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = rawproc.1; sourceTree = "<group>"; };
@@ -47,6 +64,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7E0CF0BF13F1D1F0004ED14F /* bigint */ = {
+			isa = PBXGroup;
+			children = (
+				7E0CF0C113F1D229004ED14F /* BigInteger.hh */,
+				7E0CF0C213F1D229004ED14F /* BigIntegerAlgorithms.hh */,
+				7E0CF0C313F1D229004ED14F /* BigIntegerLibrary.hh */,
+				7E0CF0C413F1D229004ED14F /* BigIntegerUtils.hh */,
+				7E0CF0C513F1D229004ED14F /* BigUnsigned.hh */,
+				7E0CF0C613F1D229004ED14F /* BigUnsignedInABase.hh */,
+				7E0CF0C713F1D229004ED14F /* NumberlikeArray.hh */,
+				7E0CF0C813F1D229004ED14F /* BigInteger.cc */,
+				7E0CF0C913F1D229004ED14F /* BigIntegerAlgorithms.cc */,
+				7E0CF0CA13F1D229004ED14F /* BigIntegerUtils.cc */,
+				7E0CF0CB13F1D229004ED14F /* BigUnsigned.cc */,
+				7E0CF0CC13F1D229004ED14F /* BigUnsignedInABase.cc */,
+			);
+			name = bigint;
+			sourceTree = "<group>";
+		};
 		7EB8426413E871020030F035 = {
 			isa = PBXGroup;
 			children = (
@@ -67,6 +103,7 @@
 		7EB8427213E871020030F035 /* rawproc */ = {
 			isa = PBXGroup;
 			children = (
+				7E0CF0BF13F1D1F0004ED14F /* bigint */,
 				7EB8427313E871020030F035 /* main.cpp */,
 				7EB8427513E871020030F035 /* rawproc.1 */,
 				7EB8428013E88E4A0030F035 /* jpeg.cpp */,
@@ -127,6 +164,11 @@
 			files = (
 				7EB8427413E871020030F035 /* main.cpp in Sources */,
 				7EB8428113E88E4A0030F035 /* jpeg.cpp in Sources */,
+				7E0CF0CD13F1D229004ED14F /* BigInteger.cc in Sources */,
+				7E0CF0CE13F1D229004ED14F /* BigIntegerAlgorithms.cc in Sources */,
+				7E0CF0CF13F1D229004ED14F /* BigIntegerUtils.cc in Sources */,
+				7E0CF0D013F1D229004ED14F /* BigUnsigned.cc in Sources */,
+				7E0CF0D113F1D229004ED14F /* BigUnsignedInABase.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,6 +257,7 @@
 				7EB8427B13E871020030F035 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

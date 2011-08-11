@@ -9,7 +9,10 @@
 #include <iostream>
 #include <fstream>
 
+#include "BigInteger.hh"
+#include "BigIntegerUtils.hh"
 #include "jpeg.h"
+#include "math.h"
 
 struct Cr2Header {
     uint16_t byte_order;
@@ -171,37 +174,151 @@ public:
             }
         }
         
-        double f_number = 8;
+        /*double f_number = 8;
         double exposure = 1/500;
         double iso = 100;
         double q = 0.65; // http://en.wikipedia.org/wiki/Film_speed
         
-        
-        for(int i = 0; i<w*h; i++) {
-            
-        }
+        */
         
         /*
+        long wl = 15600;
+        long bl = 1024;
+        
+        int wl_c = 0;
+        int bl_c = 0;
+        int total;
+        
+        int test[16000];
+        memset(&test, 16000, 4);
+        
+        int min = 16000;
+        int max = 0;
+    
+        
+        BigInteger movavg(0);
+        BigInteger wh(w*h);
+        
+        for(int x = 73; x<4823; x++) {
+            for(int y = 32; y<3198; y++) {
+                int px = pixels[y*w+x];
+                if(px>=wl) wl_c++;
+                if(px<=bl) {
+                    bl_c++;
+                    std::cout<<"x="<<x<<";y="<<y<<";v="<<px<<std::endl;
+                }
+                
+                test[px]++;
+                
+                if(px<min) min=px;
+                if(px>max) max=px;
+                
+                total++;
+                movavg += px;
+            }
+        }
+        
+        std::cout<<min<<"-"<<max<<std::endl;
+        
+        for(int i = min; i<=max; i++) {
+            std::cout<<i<<"\t"<<test[i]<<std::endl;
+        }
+        
+        std::cout << "bl_c=" << bl_c << std::endl << "wl_c="<< wl_c << std::endl;
+        std::cout << "total= " << movavg << std::endl;
+        std::cout << "num=" << wh << std::endl;
+        std::cout << "mean= " << (movavg / total).toUnsignedLong() << std::endl;
+        */
+        
+        double exposure = 0.025;
+        double aperture = 9;
+        double sensitivity = 100;
+        double ev = log2(pow(aperture,2))-log2(exposure)-log2(sensitivity/100);
+        
+        double min_ev = 100;
+        double max_ev = -100;
+        
+        double total = 0;
+        double total_c = 0;
+        
+        for(int x = 73; x<4823; x++) {
+            for(int y = 32; y<3198; y++) {
+                double px = pixels[y*w+x]-2048 < 1 ? 1 : pixels[y*w+x]-2048;
+                
+                
+                
+                double pxev = log2(px/1000);
+                
+                double tev = ev+pxev;
+                
+                if(tev < 0)              total_c++;
+                
+//                if(pxev==-INFINITY) low_tev = px;
+                
+//                if(pxev < low_tev) low_tev = pxev;
+                if(tev < min_ev) min_ev = tev;
+                if(tev > max_ev) max_ev = tev;
+            }
+        }
+        
+        std::cout<<"total pxev="<<total_c<<std::endl;
+        
+        double min_val = pow(2, min_ev);
+        double max_val = pow(2, max_ev);
+        
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
         out<<w<<std::endl;
         out<<h<<std::endl;
-        out<<"65535"<<std::endl;
+        //out<<"65535"<<std::endl;
+        out<<"255"<<std::endl;
+        
+       // min_val = 0;
+       // max_val = 15;
+        
+        std::cout<<"ev="<<ev<<std::endl;
+     //   std::cout<<"lev="<<low_tev<<std::endl;
+        std::cout<<"min_val="<<min_val<<std::endl;
+        std::cout<<"max_val="<<max_val<<std::endl;
+        
+        BigInteger evcounter(0);
+        int evcounter_i = 0;
         
         for(int i = 0; i<w*h; i++) {
-            unsigned char c1;
+                double px = pixels[i]-2048 < 1 ? 1 : pixels[i]-2048;
+            
+            double pxev = log2(px/1000);
+            double tev = ev+pxev;
+            
+            double val = pow(2,tev);
+            
+            //double scaled_val = ((val-min_val)/(max_val-min_val))*(2^0xFFFF);
+            double scaled_val = ((val-min_val)/(max_val-min_val));
+            if(scaled_val < 0) scaled_val = 0;
+            if(scaled_val > 1) scaled_val = 1;
+            double gamma_corrected = pow(scaled_val,0.45);
+            
+            // clams!
+
+            
+            unsigned int scaled_val_i = gamma_corrected*255.0;
+            
+            evcounter += scaled_val_i;
+            evcounter_i++;
+            
+            //unsigned char c1;
             unsigned char c2;
             
-            c2 = (unsigned char)(pixels[i] & 0xFF);
-            c1 = (unsigned char)((pixels[i] & 0xFF00)>>8);
+            c2 = (unsigned char)(scaled_val_i & 0xFF);
+            //c1 = (unsigned char)((scaled_val_i & 0xFF00)>>8);
             
-            out.put(c1);
+            //out.put(c1);
             out.put(c2);
         }
         
-        out.close();*/
+        out.close();
         
-        
+        std::cout << (evcounter / evcounter_i )<<std::endl;
     /*
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
@@ -229,7 +346,8 @@ public:
 int main (int argc, const char * argv[])
 {
     try {
-        const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/07/23/20110723-203953/_MG_1846.CR2";
+        //const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/08/09/20110809-211100/_MG_2038.CR2";
+        const char* file_path = "/Users/cameron/Pictures/2011_08_09/_MG_2102.CR2";
         Cr2Parser parser(file_path);
         parser.Parse();
     } catch (const char* str) {
