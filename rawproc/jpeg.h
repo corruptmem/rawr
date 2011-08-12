@@ -1,15 +1,5 @@
-//
-//  jpeg.h
-//  rawproc
-//
-//  Created by Cameron Harris on 02/08/2011.
-//  Copyright 2011 Altis Partners. All rights reserved.
-//
-
 #ifndef rawproc_jpeg_h
 #define rawproc_jpeg_h
-
-
 
 typedef  unsigned short ushort;
 typedef unsigned char uchar;
@@ -37,13 +27,8 @@ private:
 public:
     struct jhead jhactual;
     
-    ljpeg(std::istream& data, int size);
-    /*
-    void fread(unsigned char* data, int m, int n);
-    unsigned int fgetc();
-    unsigned int getc();
-    void fseek(int amount, int seektype);
-     */
+    ljpeg(std::istream& data);
+
     unsigned  getbithuff (int nbits, ushort *huff);
     unsigned getbits(int nbits);
     
@@ -52,7 +37,7 @@ public:
     }
     
     ushort * make_decoder_ref (const uchar **source);
-    int start (int info_only);
+    int start ();
     void merror (void *ptr, const char *where);
     void end ();
     int diff (ushort *huff);

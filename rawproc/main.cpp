@@ -1,11 +1,3 @@
-//
-//  main.cpp
-//  rawproc
-//
-//  Created by Cameron Harris on 02/08/2011.
-//  Copyright 2011 Altis Partners. All rights reserved.
-//
-
 #include <iostream>
 #include <fstream>
 
@@ -130,8 +122,8 @@ public:
         file.seekg(strip_offset, std::ios_base::beg);
         //file.read(raw_buf, strip_byte_counts);
         
-        ljpeg jp(file, strip_byte_counts);
-        jp.start(0);
+        ljpeg jp(file);
+        jp.start();
         //----------
         
         ushort *rp;
