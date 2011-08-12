@@ -1,47 +1,49 @@
 #ifndef rawproc_jpeg_h
 #define rawproc_jpeg_h
-
+/*
 typedef  unsigned short ushort;
 typedef unsigned char uchar;
 typedef long long INT64;
-typedef unsigned long long UINT64;
+typedef unsigned long long UINT64;*/
 
 struct jhead {
     int bits, high, wide, clrs, sraw, psv, restart, vpred[6];
-    ushort *huff[6], *free[4], *row;
+    unsigned short *huff[6], *free[4], *row;
 };
 
 class ljpeg {
 private: 
-    unsigned data_error;
-    const char* ifname;
-    unsigned zero_after_ff;
-    unsigned dng_version;
+    bool _is_initialized;
     struct jhead* jh;
     
-    /*const unsigned char* _data;*/
-    std::istream& _data;
-    int _size;
-    int _pos;
-    const int SeekCur;
-public:
-    struct jhead jhactual;
+    unsigned int _bitbuf;
+    int _vbits;
     
-    ljpeg(std::istream& data);
-
-    unsigned  getbithuff (int nbits, ushort *huff);
+    std::istream& _data;
+    
+    void Init();
+    unsigned short* MakeDecoderRef(const unsigned char **source);
+    unsigned getbithuff (int nbits, unsigned short *huff);
     unsigned getbits(int nbits);
+    int diff (unsigned short *huff);
     
     template<typename T> unsigned gethuff(T& h) {
         return getbithuff(*h, h+1);
     }
     
-    ushort * make_decoder_ref (const uchar **source);
-    int start ();
-    void merror (void *ptr, const char *where);
+public:
+    struct jhead jhactual;
+    
+    ljpeg(std::istream& data);
+
+
+    int get_height();
+    int get_width();
+
+    
     void end ();
-    int diff (ushort *huff);
-    ushort * row (int jrow);
+
+    unsigned short * row (int jrow);
     
 };
 #endif

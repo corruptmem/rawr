@@ -3,75 +3,69 @@
 
 #include "jpeg.h"
 
-ljpeg::ljpeg(std::istream& data) : SeekCur(1), _data(data) {
+ljpeg::ljpeg(std::istream& data) : 
+        _data(data), 
+        _bitbuf(0), 
+        _vbits(0),
+        _is_initialized(0){
+            
     jh = &jhactual;
-    _pos = 0;
 }
 
-unsigned ljpeg::getbithuff (int nbits, ushort *huff)
+unsigned int ljpeg::getbithuff (int nbits, unsigned short *huff)
 {
-    static unsigned bitbuf=0;
-    static int vbits=0, reset=0;
-    unsigned c;
-    
     if (nbits == -1)
     {
-        bitbuf = 0;
-        vbits = 0;
-        reset = 0;
+        _bitbuf = 0;
+        _vbits = 0;
         
         return 0;
     }
     
-    if (nbits == 0 || vbits < 0) {
+    if (nbits == 0 || _vbits < 0) {
         return 0;
     }
     
     while(true) {
-        if(vbits >= nbits) break;
-        
+        if(_vbits >= nbits) break;
         if(_data.eof()) break;
         
-        c = _data.get();
+        unsigned int c = _data.get();
     
-        
-        if(zero_after_ff && c == 0xff) {
+        if(c == 0xff) {
             if(_data.get()) {
-                reset = 1;
                 break;
             }
         }
         
-        reset = 0;
-        
-        bitbuf = (bitbuf << 8) + (uchar) c;
-        vbits += 8;
+        _bitbuf = (_bitbuf << 8) + (unsigned char) c;
+        _vbits += 8;
     }
     
-    c = bitbuf << (32-vbits) >> (32-nbits);
+    unsigned int c = _bitbuf << (32-_vbits) >> (32-nbits);
     if (huff) {
-        vbits -= huff[c] >> 8;
-        c = (uchar) huff[c];
+        _vbits -= huff[c] >> 8;
+        c = (unsigned char) huff[c];
     } else {
-        vbits -= nbits;
+        _vbits -= nbits;
     }
     
-    if (vbits < 0) {
+    if (_vbits < 0) {
         throw "Vbits was 0";
     }
     
     return c;
 }
 
-unsigned ljpeg::getbits(int nbits) {
+unsigned int ljpeg::getbits(int nbits) {
     return getbithuff(nbits, 0);
 }
 
-ushort * ljpeg::make_decoder_ref (const uchar **source)
+unsigned short* ljpeg::MakeDecoderRef(const unsigned char **source)
 {
     int max, len, h, i, j;
-    const uchar *count;
-    ushort *huff;
+    const unsigned char *count;
+    unsigned short *huff;
     
     *source += 16;
     count = *source - 17;
@@ -79,7 +73,7 @@ ushort * ljpeg::make_decoder_ref (const uchar **source)
     for (max=16; max && !count[max]; max--);
     
     uint32_t huff_size = 1+(1<<max);
-    huff = new ushort[huff_size];
+    huff = new unsigned short[huff_size];
     memset(huff, 0, huff_size);
     
     huff[0] = max;
@@ -95,18 +89,21 @@ ushort * ljpeg::make_decoder_ref (const uchar **source)
     return huff;
 }
 
-int ljpeg::start()
+void ljpeg::Init()
 {
+    if(_is_initialized) return;
+    _is_initialized = true;
+    
     int c, tag, len;
-    uchar data[0x10000];
-    const uchar *dp;
+    unsigned char data[0x10000];
+    const unsigned char *dp;
             
     memset (jh, 0, sizeof *jh);
     jh->restart = INT_MAX;
     _data.read((char*)data, 2);
     
     if (data[1] != 0xd8) {
-        return 0;
+        throw "Didn't understand LJPEG header (1)";
     }
     
     do {
@@ -116,7 +113,7 @@ int ljpeg::start()
         len = (data[2] << 8 | data[3]) - 2;
         
         if (tag <= 0xff00) {
-            return 0;
+            throw "Didn't understand LJPEG header (2)";
         }
         
         _data.read((char*)data, len);
@@ -131,7 +128,7 @@ int ljpeg::start()
                 jh->wide = data[3] << 8 | data[4];
                 jh->clrs = data[5] + jh->sraw;
                 
-                if (len == 9 && !dng_version) {
+                if (len == 9) {
                     _data.get();
                 }
                 
@@ -139,7 +136,7 @@ int ljpeg::start()
                 
             case 0xffc4:
                 for (dp = data; dp < data+len && (c = *dp++) < 4; ) {
-                    jh->free[c] = jh->huff[c] = make_decoder_ref (&dp);
+                    jh->free[c] = jh->huff[c] = MakeDecoderRef(&dp);
                 }
                 
                 break;
@@ -170,15 +167,7 @@ int ljpeg::start()
         }
     }
     
-    jh->row = (ushort *) calloc (jh->wide*jh->clrs, 4);
-    merror (jh->row, "ljpeg_start()");
-    return zero_after_ff = 1;
-}
-
-void ljpeg::merror (void *ptr, const char *where)
-{
-    if (ptr) return;
-    throw "Out of memory";
+    jh->row = (unsigned short*) calloc (jh->wide*jh->clrs, 4);
 }
 
 void ljpeg::end ()
@@ -192,14 +181,14 @@ void ljpeg::end ()
     free (jh->row);
 }
 
-int ljpeg::diff (ushort *huff)
+int ljpeg::diff (unsigned short *huff)
 {
     int len, diff;
     
     len = gethuff(huff);
     
-    if (len == 16 && (!dng_version || dng_version >= 0x1010000)) {
-        return -32768;
+    if (len == 16) {
+        throw "len was 16";
     }
     
     diff = getbits(len);
@@ -211,10 +200,22 @@ int ljpeg::diff (ushort *huff)
     return diff;
 }
 
-ushort * ljpeg::row (int jrow)
+int ljpeg::get_height() {
+    Init();
+    return jhactual.high;
+}
+
+int ljpeg::get_width() {
+    Init();
+    return jhactual.wide;
+}
+
+unsigned short * ljpeg::row(int jrow)
 {
+    Init();
+    
     int diff, pred, spred=0;
-    ushort mark=0, *row[3];
+    unsigned short mark=0, *row[3];
 
     if (jrow * jh->wide % jh->restart == 0) {
         for(int c = 0; c<6; c++) {

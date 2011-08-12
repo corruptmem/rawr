@@ -123,16 +123,15 @@ public:
         //file.read(raw_buf, strip_byte_counts);
         
         ljpeg jp(file);
-        jp.start();
         //----------
         
-        ushort *rp;
+        unsigned short *rp;
     
         int h = 3516;
         int w = 5344;
         
-        int j_h = jp.jhactual.high;
-        int j_w = jp.jhactual.wide;
+        int j_h = jp.get_height();
+        int j_w = jp.get_width();
         int j_c = 4;
         
         uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
