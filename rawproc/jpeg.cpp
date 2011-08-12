@@ -20,7 +20,6 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
 }
     
     void ljpeg::fread(unsigned char* data, int m, int n) {
-        //std::cout<<"read"<<std::endl;
         int dst = 0;
         for(int i = 0; i<n; i++) {
             
@@ -37,7 +36,6 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
     }
     
     unsigned int ljpeg::fgetc() {
-        //std::cout<<"getc"<<std::endl;
         if(_pos >= _size) {
             return EOF;
         }
@@ -53,28 +51,55 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
         _pos = _pos + amount;
     }
     
-    unsigned  ljpeg::getbithuff (int nbits, ushort *huff)
+    unsigned ljpeg::getbithuff (int nbits, ushort *huff)
     {
         static unsigned bitbuf=0;
         static int vbits=0, reset=0;
         unsigned c;
         
         if (nbits == -1)
-            return bitbuf = vbits = reset = 0;
-        if (nbits == 0 || vbits < 0) return 0;
-        while (!reset && vbits < nbits && (c = fgetc()) != EOF &&
-               !(reset = zero_after_ff && c == 0xff && fgetc())) {
+        {
+            bitbuf = 0;
+            vbits = 0;
+            reset = 0;
+            
+            return 0;
+        }
+        
+        if (nbits == 0 || vbits < 0) {
+            return 0;
+        }
+        
+        while(true) {
+            if(vbits >= nbits) break;
+            
+            c = fgetc();
+            
+            if(c == EOF) break;
+            
+            if(zero_after_ff && c == 0xff && fgetc()) {
+                reset = 1;
+                break;
+            }
+            
+            reset = 0;
+            
             bitbuf = (bitbuf << 8) + (uchar) c;
             vbits += 8;
         }
+        
         c = bitbuf << (32-vbits) >> (32-nbits);
         if (huff) {
             vbits -= huff[c] >> 8;
             c = (uchar) huff[c];
-        } else
+        } else {
             vbits -= nbits;
+        }
         
-        if (vbits < 0) throw "Vbits was 0";
+        if (vbits < 0) {
+            throw "Vbits was 0";
+        }
+        
         return c;
     }
     
@@ -88,16 +113,25 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
         const uchar *count;
         ushort *huff;
         
-        count = (*source += 16) - 17;
+        *source += 16;
+        count = *source - 17;
+        
         for (max=16; max && !count[max]; max--);
-        huff = (ushort *) calloc (1 + (1 << max), sizeof *huff);
-        merror (huff, "make_decoder()");
+        
+        uint32_t huff_size = 1+(1<<max);
+        huff = new ushort[huff_size];
+        memset(huff, 0, huff_size);
+        
         huff[0] = max;
-        for (h=len=1; len <= max; len++)
-            for (i=0; i < count[len]; i++, ++*source)
-                for (j=0; j < 1 << (max-len); j++)
-                    if (h <= 1 << max)
+        for (h=len=1; len <= max; len++) {
+            for (i=0; i < count[len]; i++, ++*source) {
+                for (j=0; j < 1 << (max-len); j++) {
+                    if (h <= 1 << max) {
                         huff[h++] = len << 8 | **source;
+                    }
+                }
+            }
+        }
         return huff;
     }
     
@@ -186,8 +220,6 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
         int col, c, diff, pred, spred=0;
         ushort mark=0, *row[3];
     
-        
-        
         if (jrow * jh->wide % jh->restart == 0) {
             FORC(6) jh->vpred[c] = 1 << (jh->bits-1);
             if (jrow) {
@@ -203,23 +235,58 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
         for (col=0; col < jh->wide; col++)
             FORC(jh->clrs) {
                 diff = this->diff (jh->huff[c]);
-                if (jh->sraw && c <= jh->sraw && (col | c))
+                if (jh->sraw && c <= jh->sraw && (col | c)) {
                     pred = spred;
-                else if (col) pred = row[0][-jh->clrs];
-                else	    pred = (jh->vpred[c] += diff) - diff;
-                if (jrow && col) switch (jh->psv) {
-                    case 1:	break;
-                    case 2: pred = row[1][0];					break;
-                    case 3: pred = row[1][-jh->clrs];				break;
-                    case 4: pred = pred +   row[1][0] - row[1][-jh->clrs];		break;
-                    case 5: pred = pred + ((row[1][0] - row[1][-jh->clrs]) >> 1);	break;
-                    case 6: pred = row[1][0] + ((pred - row[1][-jh->clrs]) >> 1);	break;
-                    case 7: pred = (pred + row[1][0]) >> 1;				break;
-                    default: pred = 0;
+                } else if (col) {
+                    pred = row[0][-jh->clrs];
+                } else{
+                    pred = (jh->vpred[c] += diff) - diff;
                 }
-                if ((**row = pred + diff) >> jh->bits) throw "Data error";
-                if (c <= jh->sraw) spred = **row;
-                row[0]++; row[1]++;
+                
+                if (jrow && col) {
+                    switch (jh->psv) {
+                        case 1:	
+                            break;
+                            
+                        case 2: 
+                            pred = row[1][0];					
+                            break;
+                            
+                        case 3: 
+                            pred = row[1][-jh->clrs];
+                            break;
+                            
+                        case 4: 
+                            pred = pred + row[1][0] - row[1][-jh->clrs];
+                            break;
+                            
+                        case 5: 
+                            pred = pred + ((row[1][0] - row[1][-jh->clrs]) >> 1);
+                            break;
+                            
+                        case 6:
+                            pred = row[1][0] + ((pred - row[1][-jh->clrs]) >> 1);
+                            break;
+                            
+                        case 7: 
+                            pred = (pred + row[1][0]) >> 1;
+                            break;
+                            
+                        default: 
+                            pred = 0;
+                    }
+                }
+                
+                if ((**row = pred + diff) >> jh->bits) {
+                    throw "Data error";
+                }
+                
+                if (c <= jh->sraw) {
+                    spred = **row;
+                }
+                
+                row[0]++; 
+                row[1]++;
             }
                     
         return row[2];
