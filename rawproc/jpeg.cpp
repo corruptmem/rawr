@@ -10,47 +10,11 @@
 #define FORC4 FORC(4)
 #define FORCC FORC(colors)
 
-
-
-ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
+ljpeg::ljpeg(std::istream& data, int size) : SeekCur(1), _data(data) {
     jh = &jhactual;
-    _data = data;
     _size = size;
     _pos = 0;
 }
-    
-    void ljpeg::fread(unsigned char* data, int m, int n) {
-        int dst = 0;
-        for(int i = 0; i<n; i++) {
-            
-            int cp = m;
-            if(_pos + cp >= _size) {
-                cp = _size - _pos;
-            }
-            
-            memcpy(data+dst, _data+_pos, cp);
-            _pos += cp;
-            dst += cp;
-            if(_pos > _size) return;
-        }
-    }
-    
-    unsigned int ljpeg::fgetc() {
-        if(_pos >= _size) {
-            return EOF;
-        }
-        
-        return _data[_pos++];
-    }
-    
-    unsigned int ljpeg::getc() {
-        return fgetc();
-    }
-    
-    void ljpeg::fseek(int amount, int seektype) {
-        _pos = _pos + amount;
-    }
-    
     unsigned ljpeg::getbithuff (int nbits, ushort *huff)
     {
         static unsigned bitbuf=0;
@@ -73,13 +37,16 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
         while(true) {
             if(vbits >= nbits) break;
             
-            c = fgetc();
+            if(_data.eof()) break;
             
-            if(c == EOF) break;
+            c = _data.get();
+        
             
-            if(zero_after_ff && c == 0xff && fgetc()) {
-                reset = 1;
-                break;
+            if(zero_after_ff && c == 0xff) {
+                if(_data.get()) {
+                    reset = 1;
+                    break;
+                }
             }
             
             reset = 0;
@@ -144,16 +111,16 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
                 
         memset (jh, 0, sizeof *jh);
         jh->restart = INT_MAX;
-        fread (data, 2, 1);
+        _data.read((char*)data, 2);
         if (data[1] != 0xd8) return 0;
         
         do {
-            fread (data, 2, 2);
+            _data.read((char*)data, 4);
             
             tag =  data[0] << 8 | data[1];
             len = (data[2] << 8 | data[3]) - 2;
             if (tag <= 0xff00) return 0;
-            fread (data, 1, len);
+            _data.read((char*)data, len);
             switch (tag) {
                 case 0xffc3:
                     jh->sraw = ((data[7] >> 4) * (data[7] & 15) - 1) & 3;
@@ -162,7 +129,7 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
                     jh->high = data[1] << 8 | data[2];
                     jh->wide = data[3] << 8 | data[4];
                     jh->clrs = data[5] + jh->sraw;
-                    if (len == 9 && !dng_version) getc();
+                    if (len == 9 && !dng_version) _data.get();
                     break;
                 case 0xffc4:
                     if (info_only) break;
@@ -224,8 +191,9 @@ ljpeg::ljpeg(const unsigned char* data, int size) : SeekCur(1) {
             FORC(6) jh->vpred[c] = 1 << (jh->bits-1);
             if (jrow) {
                 
-                fseek (-2, SEEK_CUR);
-                do mark = (mark << 8) + (c = fgetc());
+                _data.seekg (-2, std::ios_base::beg);
+                _data >> c;
+                do mark = (mark << 8) + c;
                 while (c != EOF && mark >> 4 != 0xffd);
             }
             getbits(-1);

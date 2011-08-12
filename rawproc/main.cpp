@@ -126,11 +126,11 @@ public:
         file.seekg(slice_info_offset, std::ios_base::beg);
         file.read((char*)&slices, sizeof(Cr2Slices));
         
-        char* raw_buf = new char[strip_byte_counts];
+        //char* raw_buf = new char[strip_byte_counts];
         file.seekg(strip_offset, std::ios_base::beg);
-        file.read(raw_buf, strip_byte_counts);
+        //file.read(raw_buf, strip_byte_counts);
         
-        ljpeg jp((unsigned char*)raw_buf, strip_byte_counts);
+        ljpeg jp(file, strip_byte_counts);
         jp.start(0);
         //----------
         
@@ -238,7 +238,7 @@ public:
         double min_ev = 100;
         double max_ev = -100;
         
-        double total = 0;
+       // double total = 0;
         double total_c = 0;
         
         for(int x = 73; x<4823; x++) {

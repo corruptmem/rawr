@@ -29,18 +29,21 @@ private:
     unsigned dng_version;
     struct jhead* jh;
     
-    const unsigned char* _data;
+    /*const unsigned char* _data;*/
+    std::istream& _data;
     int _size;
     int _pos;
     const int SeekCur;
 public:
     struct jhead jhactual;
     
-    ljpeg(const unsigned char* data, int size);
+    ljpeg(std::istream& data, int size);
+    /*
     void fread(unsigned char* data, int m, int n);
     unsigned int fgetc();
     unsigned int getc();
     void fseek(int amount, int seektype);
+     */
     unsigned  getbithuff (int nbits, ushort *huff);
     unsigned getbits(int nbits);
     
