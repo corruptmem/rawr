@@ -15,10 +15,11 @@ private:
     
     unsigned int _bitbuf;
     int _vbits;
+    int _cur_row;
     
     /* jhead shit */
     
-    int _bits, _high, _wide, _clrs, _sraw, _psv, _restart, _vpred[6];
+    int _bits, _high, _wide, _clrs, _psv, _vpred[6];
     unsigned short *_huff[6], *_free[4], *_row;
     
     /* -- */
@@ -42,7 +43,7 @@ public:
     int get_height();
     int get_width();
 
-    unsigned short * row (int jrow);
+    unsigned short* row();
     
 };
 #endif

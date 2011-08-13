@@ -7,17 +7,16 @@ ljpeg::ljpeg(std::istream& data) :
         _data(data), 
         _bitbuf(0), 
         _vbits(0),
-        _is_initialized(0), 
-        _restart(INT_MAX),
+        _is_initialized(0),
         _bits(0),
         _high(0),
         _wide(0),
         _clrs(0),
-        _sraw(0),
         _psv(0),
         _vpred(),
         _huff(),
         _free(),
+        _cur_row(0),
         _row()
 {
 }
@@ -129,13 +128,11 @@ void ljpeg::Init()
         
         switch (tag) {
             case 0xffc3:
-                _sraw = ((tag_data[7] >> 4) * (tag_data[7] & 15) - 1) & 3;
-                
             case 0xffc0:
                 _bits = tag_data[0];
                 _high = tag_data[1] << 8 | tag_data[2];
                 _wide = tag_data[3] << 8 | tag_data[4];
-                _clrs = tag_data[5] + _sraw;
+                _clrs = tag_data[5];
                 
                 if (len == 9) {
                     _data.get();
@@ -155,25 +152,12 @@ void ljpeg::Init()
                 _psv = tag_data[1+tag_data[0]*2];
                 _bits -= tag_data[3+tag_data[0]*2] & 15;
                 break;
-                
-            case 0xffdd:
-                _restart = tag_data[0] << 8 | tag_data[1];
         }
     } while (tag != 0xffda);
     
     for(int c = 0; c < 5; c++) {
         if(!_huff[c+1]) {
             _huff[c+1] = _huff[c];
-        }
-    }
-    
-    if (_sraw) {
-        for(int c = 0; c < 4; c++) {
-            _huff[2+c] = _huff[1];
-        }
-        
-        for(int c = 0; c<_sraw; c++) {
-            _huff[1+c] = _huff[0];
         }
     }
     
@@ -220,47 +204,39 @@ int ljpeg::get_width() {
     return _wide;
 }
 
-unsigned short * ljpeg::row(int jrow)
+unsigned short * ljpeg::row()
 {
     Init();
     
+    if(_cur_row > get_height()) {
+        throw "Tried to get row past EOF";
+    }
+    
     int diff, pred, spred=0;
-    unsigned short mark=0, *row[3];
+    unsigned short *row[3];
 
-    if (jrow * _wide % _restart == 0) {
+    if (_cur_row == 0) {
         for(int c = 0; c<6; c++) {
             _vpred[c] = 1 << (_bits-1);
         }
         
-        if (jrow) {
-            int c;
-            _data.seekg (-2, std::ios_base::beg);
-            _data >> c;
-            
-            do {
-                mark = (mark << 8) + c;
-            }
-            while (mark >> 4 != 0xffd);
-        }
         getbits(-1);
     }
     
     for(int c = 0; c<3; c++) {
-        row[c] = _row + _wide*_clrs*((jrow+c) & 1);
+        row[c] = _row + _wide*_clrs*((_cur_row+c) & 1);
     }
     
     for (int col=0; col < _wide; col++)
         for(int c = 0; c<_clrs; c++) {
             diff = this->diff (_huff[c]);
-            if (_sraw && c <= _sraw && (col | c)) {
-                pred = spred;
-            } else if (col) {
+            if (col) {
                 pred = row[0][-_clrs];
             } else{
                 pred = (_vpred[c] += diff) - diff;
             }
             
-            if (jrow && col) {
+            if (_cur_row && col) {
                 switch (_psv) {
                     case 1:	
                         break;
@@ -297,14 +273,13 @@ unsigned short * ljpeg::row(int jrow)
             if ((**row = pred + diff) >> _bits) {
                 throw "Data error";
             }
-            
-            if (c <= _sraw) {
-                spred = **row;
-            }
+
+            spred = **row;
             
             row[0]++; 
             row[1]++;
         }
-                
+    
+    _cur_row++;
     return row[2];
 }
