@@ -137,13 +137,12 @@ public:
         uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
         
         int next = 0;
-        for(int jrow = 0; jrow<jp.jhactual.high; jrow++) {
+        for(int jrow = 0; jrow<j_h; jrow++) {
             rp = jp.row(jrow);
             for(int px_c = 0; px_c<j_w*j_c; px_c++) {
                 raw_px[next++] = rp[px_c];
             }
         }
-        jp.end();
         
         
         next = 0;

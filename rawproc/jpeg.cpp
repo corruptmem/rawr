@@ -7,9 +7,19 @@ ljpeg::ljpeg(std::istream& data) :
         _data(data), 
         _bitbuf(0), 
         _vbits(0),
-        _is_initialized(0){
-            
-    jh = &jhactual;
+        _is_initialized(0), 
+        _restart(INT_MAX),
+        _bits(0),
+        _high(0),
+        _wide(0),
+        _clrs(0),
+        _sraw(0),
+        _psv(0),
+        _vpred(),
+        _huff(),
+        _free(),
+        _row()
+{
 }
 
 unsigned int ljpeg::getbithuff (int nbits, unsigned short *huff)
@@ -94,39 +104,38 @@ void ljpeg::Init()
     if(_is_initialized) return;
     _is_initialized = true;
     
-    int c, tag, len;
-    unsigned char data[0x10000];
-    const unsigned char *dp;
-            
-    memset (jh, 0, sizeof *jh);
-    jh->restart = INT_MAX;
-    _data.read((char*)data, 2);
+    unsigned char ljpeg_header[2];
     
-    if (data[1] != 0xd8) {
+    _data.read((char*)ljpeg_header, 2);
+    
+    if (ljpeg_header[1] != 0xd8) {
         throw "Didn't understand LJPEG header (1)";
     }
     
+    int tag;
     do {
-        _data.read((char*)data, 4);
+        unsigned char tag_header[4];
+        _data.read((char*)tag_header, 4);
         
-        tag =  data[0] << 8 | data[1];
-        len = (data[2] << 8 | data[3]) - 2;
+        tag = tag_header[0] << 8 | tag_header[1];
+        int len = (tag_header[2] << 8 | tag_header[3]) - 2;
         
         if (tag <= 0xff00) {
             throw "Didn't understand LJPEG header (2)";
         }
         
-        _data.read((char*)data, len);
+        unsigned char tag_data[len];
+        _data.read((char*)tag_data, len);
         
         switch (tag) {
             case 0xffc3:
-                jh->sraw = ((data[7] >> 4) * (data[7] & 15) - 1) & 3;
+                _sraw = ((tag_data[7] >> 4) * (tag_data[7] & 15) - 1) & 3;
                 
             case 0xffc0:
-                jh->bits = data[0];
-                jh->high = data[1] << 8 | data[2];
-                jh->wide = data[3] << 8 | data[4];
-                jh->clrs = data[5] + jh->sraw;
+                _bits = tag_data[0];
+                _high = tag_data[1] << 8 | tag_data[2];
+                _wide = tag_data[3] << 8 | tag_data[4];
+                _clrs = tag_data[5] + _sraw;
                 
                 if (len == 9) {
                     _data.get();
@@ -135,50 +144,51 @@ void ljpeg::Init()
                 break;
                 
             case 0xffc4:
-                for (dp = data; dp < data+len && (c = *dp++) < 4; ) {
-                    jh->free[c] = jh->huff[c] = MakeDecoderRef(&dp);
+                int c;
+                for (const unsigned char* dp = tag_data; dp < tag_data+len && (c = *dp++) < 4; ) {
+                    _free[c] = _huff[c] = MakeDecoderRef(&dp);
                 }
                 
                 break;
                 
             case 0xffda:
-                jh->psv = data[1+data[0]*2];
-                jh->bits -= data[3+data[0]*2] & 15;
+                _psv = tag_data[1+tag_data[0]*2];
+                _bits -= tag_data[3+tag_data[0]*2] & 15;
                 break;
                 
             case 0xffdd:
-                jh->restart = data[0] << 8 | data[1];
+                _restart = tag_data[0] << 8 | tag_data[1];
         }
     } while (tag != 0xffda);
     
     for(int c = 0; c < 5; c++) {
-        if(!jh->huff[c+1]) {
-            jh->huff[c+1] = jh->huff[c];
+        if(!_huff[c+1]) {
+            _huff[c+1] = _huff[c];
         }
     }
     
-    if (jh->sraw) {
+    if (_sraw) {
         for(int c = 0; c < 4; c++) {
-            jh->huff[2+c] = jh->huff[1];
+            _huff[2+c] = _huff[1];
         }
         
-        for(int c = 0; c<jh->sraw; c++) {
-            jh->huff[1+c] = jh->huff[0];
+        for(int c = 0; c<_sraw; c++) {
+            _huff[1+c] = _huff[0];
         }
     }
     
-    jh->row = (unsigned short*) calloc (jh->wide*jh->clrs, 4);
+    _row = (unsigned short*) calloc (_wide*_clrs, 4);
 }
 
-void ljpeg::end ()
+ljpeg::~ljpeg()
 {
     for(int c = 0; c<4; c++) {
-        if (jh->free[c]) {
-            free (jh->free[c]);
+        if (_free[c]) {
+            free (_free[c]);
         }
     }
     
-    free (jh->row);
+    free (_row);
 }
 
 int ljpeg::diff (unsigned short *huff)
@@ -202,12 +212,12 @@ int ljpeg::diff (unsigned short *huff)
 
 int ljpeg::get_height() {
     Init();
-    return jhactual.high;
+    return _high;
 }
 
 int ljpeg::get_width() {
     Init();
-    return jhactual.wide;
+    return _wide;
 }
 
 unsigned short * ljpeg::row(int jrow)
@@ -217,9 +227,9 @@ unsigned short * ljpeg::row(int jrow)
     int diff, pred, spred=0;
     unsigned short mark=0, *row[3];
 
-    if (jrow * jh->wide % jh->restart == 0) {
+    if (jrow * _wide % _restart == 0) {
         for(int c = 0; c<6; c++) {
-            jh->vpred[c] = 1 << (jh->bits-1);
+            _vpred[c] = 1 << (_bits-1);
         }
         
         if (jrow) {
@@ -236,22 +246,22 @@ unsigned short * ljpeg::row(int jrow)
     }
     
     for(int c = 0; c<3; c++) {
-        row[c] = jh->row + jh->wide*jh->clrs*((jrow+c) & 1);
+        row[c] = _row + _wide*_clrs*((jrow+c) & 1);
     }
     
-    for (int col=0; col < jh->wide; col++)
-        for(int c = 0; c<jh->clrs; c++) {
-            diff = this->diff (jh->huff[c]);
-            if (jh->sraw && c <= jh->sraw && (col | c)) {
+    for (int col=0; col < _wide; col++)
+        for(int c = 0; c<_clrs; c++) {
+            diff = this->diff (_huff[c]);
+            if (_sraw && c <= _sraw && (col | c)) {
                 pred = spred;
             } else if (col) {
-                pred = row[0][-jh->clrs];
+                pred = row[0][-_clrs];
             } else{
-                pred = (jh->vpred[c] += diff) - diff;
+                pred = (_vpred[c] += diff) - diff;
             }
             
             if (jrow && col) {
-                switch (jh->psv) {
+                switch (_psv) {
                     case 1:	
                         break;
                         
@@ -260,19 +270,19 @@ unsigned short * ljpeg::row(int jrow)
                         break;
                         
                     case 3: 
-                        pred = row[1][-jh->clrs];
+                        pred = row[1][-_clrs];
                         break;
                         
                     case 4: 
-                        pred = pred + row[1][0] - row[1][-jh->clrs];
+                        pred = pred + row[1][0] - row[1][-_clrs];
                         break;
                         
                     case 5: 
-                        pred = pred + ((row[1][0] - row[1][-jh->clrs]) >> 1);
+                        pred = pred + ((row[1][0] - row[1][-_clrs]) >> 1);
                         break;
                         
                     case 6:
-                        pred = row[1][0] + ((pred - row[1][-jh->clrs]) >> 1);
+                        pred = row[1][0] + ((pred - row[1][-_clrs]) >> 1);
                         break;
                         
                     case 7: 
@@ -284,11 +294,11 @@ unsigned short * ljpeg::row(int jrow)
                 }
             }
             
-            if ((**row = pred + diff) >> jh->bits) {
+            if ((**row = pred + diff) >> _bits) {
                 throw "Data error";
             }
             
-            if (c <= jh->sraw) {
+            if (c <= _sraw) {
                 spred = **row;
             }
             
