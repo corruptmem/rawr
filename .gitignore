@@ -5,6 +5,8 @@
 *.xcuserstate
 project.xcworkspace/
 xcuserdata/
+*.build
+build/
 
 *.[oa]
 a.out
