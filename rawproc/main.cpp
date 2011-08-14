@@ -134,124 +134,66 @@ public:
         int j_w = jp.get_width();
         int j_c = 4;
         
-        uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
-        
-        int next = 0;
-        for(int jrow = 0; jrow<j_h; jrow++) {
-            rp = jp.row();
-            for(int px_c = 0; px_c<j_w*j_c; px_c++) {
-                raw_px[next++] = rp[px_c];
-            }
-        }
+        //uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
         
         
-        next = 0;
-        uint16_t* pixels = new uint16_t[w*h];
-        
-        for(int i = 0; i<w*h; i++) pixels[i] = 0;
-        
-        for(int strip_i = 0; strip_i<slices.num_first_strips+1; strip_i++) {
-            for(int y = 0; y<h; y++) {
-                for(int x = 0; x<(strip_i==slices.num_first_strips?slices.last_strip_px:slices.first_strip_px); x+=4) {
-                    //pixels[y*w+x+slices.first_strip_px*strip_i] = raw_px[j_w*y+x*j_c];
-                    pixels[y*w+x+slices.first_strip_px*strip_i] = raw_px[next];
-                    pixels[y*w+x+slices.first_strip_px*strip_i+1] = raw_px[next+1];
-                    pixels[y*w+x+slices.first_strip_px*strip_i+2] = raw_px[next+2];
-                    pixels[y*w+x+slices.first_strip_px*strip_i+3] = raw_px[next+3];
-                    
-                    next+=4;
-                }
-            }
-        }
-        
-        /*double f_number = 8;
-        double exposure = 1/500;
-        double iso = 100;
-        double q = 0.65; // http://en.wikipedia.org/wiki/Film_speed
-        
-        */
-        
-        /*
-        long wl = 15600;
-        long bl = 1024;
-        
-        int wl_c = 0;
-        int bl_c = 0;
-        int total;
-        
-        int test[16000];
-        memset(&test, 16000, 4);
-        
-        int min = 16000;
-        int max = 0;
-    
-        
-        BigInteger movavg(0);
-        BigInteger wh(w*h);
-        
-        for(int x = 73; x<4823; x++) {
-            for(int y = 32; y<3198; y++) {
-                int px = pixels[y*w+x];
-                if(px>=wl) wl_c++;
-                if(px<=bl) {
-                    bl_c++;
-                    std::cout<<"x="<<x<<";y="<<y<<";v="<<px<<std::endl;
-                }
-                
-                test[px]++;
-                
-                if(px<min) min=px;
-                if(px>max) max=px;
-                
-                total++;
-                movavg += px;
-            }
-        }
-        
-        std::cout<<min<<"-"<<max<<std::endl;
-        
-        for(int i = min; i<=max; i++) {
-            std::cout<<i<<"\t"<<test[i]<<std::endl;
-        }
-        
-        std::cout << "bl_c=" << bl_c << std::endl << "wl_c="<< wl_c << std::endl;
-        std::cout << "total= " << movavg << std::endl;
-        std::cout << "num=" << wh << std::endl;
-        std::cout << "mean= " << (movavg / total).toUnsignedLong() << std::endl;
-        */
+        double* pixels = new double[w*h];
         
         double exposure = 0.025;
         double aperture = 9;
         double sensitivity = 100;
         double ev = log2(pow(aperture,2))-log2(exposure)-log2(sensitivity/100);
         
+        int next = 0;
         double min_ev = 100;
         double max_ev = -100;
         
-       // double total = 0;
-        double total_c = 0;
-        
-        for(int x = 73; x<4823; x++) {
-            for(int y = 32; y<3198; y++) {
-                double px = pixels[y*w+x]-2048 < 1 ? 1 : pixels[y*w+x]-2048;
+        for(int jrow = 0; jrow<j_h; jrow++) {
+            rp = jp.row();
+            
+            
+            
+            for(int px_c = 0; px_c < j_w*j_c; px_c++) {
+                int strip_num = next / (h * slices.first_strip_px);
+                if(strip_num > 2) {
+                    strip_num = 2;
+                }
                 
+                int x, y;
+                if(strip_num != slices.num_first_strips) {
+                    y = (next / slices.first_strip_px) % h;
+                    x = next % slices.first_strip_px + slices.first_strip_px*strip_num;
+                } else {
+                    int sub_count = slices.num_first_strips * slices.first_strip_px * h;
+                    int this_count = next - sub_count;
+                    y = this_count / slices.last_strip_px;
+                    x = this_count % slices.last_strip_px + slices.first_strip_px*strip_num;
+                }
                 
+                int pxpos = y*w + x;
                 
+                if(pxpos > w*h || pxpos < 0) {
+                    break;
+                }
+                
+                //pixels[pxpos] = rp[px_c];
+                double pxv = rp[px_c];
+                double px = pxv-2048 < 1 ? 1 : pxv-2048;
                 double pxev = log2(px/1000);
-                
                 double tev = ev+pxev;
+                double val = pow(2,tev);
                 
-                if(tev < 0)              total_c++;
-                
-//                if(pxev==-INFINITY) low_tev = px;
-                
-//                if(pxev < low_tev) low_tev = pxev;
                 if(tev < min_ev) min_ev = tev;
                 if(tev > max_ev) max_ev = tev;
+                
+                pixels[pxpos] = val;
+                
+                next++;
+                 
             }
         }
-        
-        std::cout<<"total pxev="<<total_c<<std::endl;
+
+
         
         double min_val = pow(2, min_ev);
         double max_val = pow(2, max_ev);
@@ -275,12 +217,7 @@ public:
         int evcounter_i = 0;
         
         for(int i = 0; i<w*h; i++) {
-                double px = pixels[i]-2048 < 1 ? 1 : pixels[i]-2048;
-            
-            double pxev = log2(px/1000);
-            double tev = ev+pxev;
-            
-            double val = pow(2,tev);
+            double val = pixels[i];
             
             //double scaled_val = ((val-min_val)/(max_val-min_val))*(2^0xFFFF);
             double scaled_val = ((val-min_val)/(max_val-min_val));
