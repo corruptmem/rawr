@@ -12,9 +12,11 @@ int main (int argc, const char * argv[])
     
     try {
         const char* file_path = "./_MG_2016.CR2";
-        //const char* file_path = "/Users/cameron/Pictures/2011_08_09/_MG_2102.CR2";
+        //const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/08/09/20110809-211100/_MG_2059.CR2";
         
         Cr2Reader parser(file_path);
+//        std::cout<<"End"<<std::endl;
+//        return 0;
         RawSensel* pixels = parser.Process();
         
         int w = parser.get_width();
@@ -23,18 +25,7 @@ int main (int argc, const char * argv[])
         double min_val = parser.get_min_val();
         double max_val = parser.get_max_val();
         
-        // create glut
-        
         GammaLookupTree glt(1.0/0.45, 256);
-        
-        /*
-        double glut_idx[256];
-        double glut_val[256];
-        double gammaf = (1.0/0.45);
-        for(int i = 0; i < 256; i++) {
-            glut_val[i] = ((double)i)*(1.0/256.0);
-            glut_idx[i] = pow(glut_val[i], gammaf);
-        }*/
         
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
@@ -49,11 +40,8 @@ int main (int argc, const char * argv[])
             if(scaled_val < 0) scaled_val = 0;
             if(scaled_val > 1) scaled_val = 1;
             
-            // -- gamma --
-            
             unsigned int scaled_val_i = glt.get(scaled_val);
-            
-            // -- // gamma -- 
+            //unsigned int scaled_val_i = glt.get(pixels[i].prob);
             
             out.put((unsigned char)(scaled_val_i & 0xFF));
          

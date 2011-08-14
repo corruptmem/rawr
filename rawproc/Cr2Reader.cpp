@@ -1,8 +1,49 @@
 #include <iostream>
 #include <math.h>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/median.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 
 #include "Cr2Reader.h"
+
+using namespace boost::accumulators;
+
+struct Cr2Header {
+    uint16_t byte_order;
+    uint16_t magic_word;
+    uint32_t tiff_offset;
+    uint16_t cr2_magic_word;
+    uint8_t cr2_major_ver;
+    uint8_t cr2_minor_ver;
+    uint32_t raw_ifd_offset;
     
+public:
+    bool is_valid_header();
+};
+
+struct Cr2IfdEntry {
+    uint16_t tag_id;
+    uint16_t tag_type;
+    uint32_t number_of_val;
+    uint32_t val;
+};
+
+struct Cr2IfdHeader {
+    uint16_t entries_count;
+};
+
+struct Cr2IfdFooter {
+    uint32_t next_ifd;
+};
+
+struct Cr2Slices {
+    uint16_t num_first_strips;
+    uint16_t first_strip_px;
+    uint16_t last_strip_px;
+};
+
 bool Cr2Header::is_valid_header() {
     if(byte_order!= 0x4949) 
         return false;
@@ -25,11 +66,71 @@ bool Cr2Header::is_valid_header() {
     return true;
 }
 
+struct scale_points {
+    int scale_in_start;
+    double scale_out_start;
+    
+    scale_points(
+        int scale_in_start, 
+        double scale_out_start) : 
+            scale_in_start(scale_in_start),
+            scale_out_start(scale_out_start) { }
+};
+
 Cr2Reader::Cr2Reader(const char* path) :
     _path(path),
     _file(path),
-    _file_parsed(false)
-    { }
+    _file_parsed(false) { 
+    
+        scale_points mappings[] = {
+            scale_points(0, 0.0),
+            scale_points(50, 0.1),
+            scale_points(120, 0.3),
+            scale_points(200, 0.5),
+            scale_points(300, 0.6),
+            scale_points(500, 0.7),
+            scale_points(900, 0.9),
+            scale_points(1100, 0.9),
+            scale_points(2200, 0.8),
+            scale_points(3000, 0.7),
+            scale_points(3300, 0.6),
+            scale_points(4200, 0.5),
+            scale_points(5000, 0.4),
+            scale_points(6500, 0.3),
+            scale_points(8000, 0.2),
+            scale_points(9000, 0.15),
+            scale_points(12000, 0.1),
+            scale_points(16384, 0.0)
+        };
+        
+        int cur = 0;
+        int count = sizeof(mappings)/sizeof(scale_points);
+        scale_points* cur_map = mappings;
+        
+        for(int i = 0; i<65536; i++) {
+            if(cur<(count-2) && i>(cur_map+1)->scale_in_start) {
+                cur++;
+                cur_map++;
+            }
+            
+            int cur_in = cur_map->scale_in_start;
+            double cur_out = cur_map->scale_out_start;
+            
+            int next_in;
+            double next_out;
+            
+            if(cur<(count-2)) {
+                next_in = (cur_map+1)->scale_in_start;
+                next_out =(cur_map+1)->scale_out_start; 
+            } else {
+                next_in = 65536;
+                next_out = 0.0;
+            }
+            
+            double fact = (((double)i)-((double)cur_in))/(((double)next_in)-((double)cur_in)); 
+            _base_probs[i] = (next_out - cur_out)*fact + cur_out;
+        }
+}
 
 int Cr2Reader::get_width() {
     return _sensor_width;
@@ -46,7 +147,6 @@ double Cr2Reader::get_min_val() {
 double Cr2Reader::get_max_val() {
     return _max_val;
 }
-
 
 void Cr2Reader::Parse() {
     if(!_file.is_open()) {
@@ -270,37 +370,15 @@ RawSensel* Cr2Reader::Process() {
                 break;
             }
             
-            double pxv = rp[px_c];
-            double px = pxv-2048 < 1 ? 1 : pxv-2048;
-            double val = kev*(px/1000);
+            unsigned short pxv = rp[px_c];
+            unsigned short  px = pxv-2048 < 1 ? 1 : pxv-2048;
+            double val = kev*(((double)px)/1000);
             
             if(val < _min_val) _min_val = val;
             if(val > _max_val) _max_val = val;
             
             pixels[pxpos].val = val;
-            double base_prob;
-            if(val < 2500) {
-                base_prob = 0.2;
-            } else if (val < 3200) {
-                base_prob = 0.4;
-            } else if (val < 4500) {
-                base_prob = 0.6;
-            } else if (val < 5000) {
-                base_prob = 0.8;
-            } else if (val > 13000) {
-                base_prob = 0.8;
-            } else if (val > 13500) {
-                base_prob = 0.6;
-            } else if (val > 14000) {
-                base_prob = 0.4;
-            } else if (val > 15000) {
-                base_prob = 0.2;
-            } else {
-                base_prob = 0.9;
-            }
-            
-            pixels[pxpos].prob = base_prob / (sensitivity/100);
-            
+            pixels[pxpos].prob = _base_probs[px] / (sensitivity/100);
             
             next++;
         }
