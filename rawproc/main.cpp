@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "Cr2Reader.h"
+#include "GammaLookupTree.h"
 
 int main (int argc, const char * argv[])
 {
@@ -24,13 +25,16 @@ int main (int argc, const char * argv[])
         
         // create glut
         
+        GammaLookupTree glt(1.0/0.45, 256);
+        
+        /*
         double glut_idx[256];
         double glut_val[256];
         double gammaf = (1.0/0.45);
         for(int i = 0; i < 256; i++) {
             glut_val[i] = ((double)i)*(1.0/256.0);
             glut_idx[i] = pow(glut_val[i], gammaf);
-        }
+        }*/
         
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
@@ -47,14 +51,7 @@ int main (int argc, const char * argv[])
             
             // -- gamma --
             
-            int j;
-            for(j = 0; j<256; j++) {
-                if(scaled_val < glut_idx[j]) {
-                    break;
-                }
-            }
-            
-            double gamma_corrected = glut_val[j];
+            double gamma_corrected = glt.get(scaled_val);
             unsigned int scaled_val_i = gamma_corrected*255.0;
             
             // -- // gamma -- 

@@ -11,6 +11,7 @@
 		7EB8428113E88E4A0030F035 /* LJpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8428013E88E4A0030F035 /* LJpeg.cpp */; };
 		7EC4259C13F84FAF00091101 /* Cr2Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */; };
 		7EC4259F13F8521400091101 /* _MG_2016.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EC4259D13F851E800091101 /* _MG_2016.CR2 */; };
+		7EC425A313F852ED00091101 /* GammaLookupTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EC425A213F852ED00091101 /* GammaLookupTree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,8 @@
 		7EB8428213E895530030F035 /* LJpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LJpeg.h; sourceTree = "<group>"; };
 		7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cr2Reader.cpp; sourceTree = "<group>"; };
 		7EC4259D13F851E800091101 /* _MG_2016.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2016.CR2; sourceTree = "<group>"; };
+		7EC425A213F852ED00091101 /* GammaLookupTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GammaLookupTree.cpp; sourceTree = "<group>"; };
+		7EC425A413F852FC00091101 /* GammaLookupTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GammaLookupTree.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +75,8 @@
 				7EB8428213E895530030F035 /* LJpeg.h */,
 				7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */,
 				7E74327F13F84C1B009A7BED /* Cr2Reader.h */,
+				7EC425A213F852ED00091101 /* GammaLookupTree.cpp */,
+				7EC425A413F852FC00091101 /* GammaLookupTree.h */,
 			);
 			path = rawproc;
 			sourceTree = "<group>";
@@ -129,6 +134,7 @@
 				7EB8427413E871020030F035 /* main.cpp in Sources */,
 				7EB8428113E88E4A0030F035 /* LJpeg.cpp in Sources */,
 				7EC4259C13F84FAF00091101 /* Cr2Reader.cpp in Sources */,
+				7EC425A313F852ED00091101 /* GammaLookupTree.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
