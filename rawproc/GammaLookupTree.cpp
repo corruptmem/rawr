@@ -9,8 +9,9 @@ GammaLookupTree::GammaLookupTree(double gammaf, int entries) {
     int _cur = 0;
     
     for(int i = 0; i<entries; i++) {
-        _leaves[_cur].val = ((double)i)*(1.0/((double)entries-1));
-        _leaves[_cur].key = pow(_leaves[_cur].val, gammaf);
+        _leaves[_cur].val = i;
+        _leaves[_cur].start = i == 0 ? 0 : _leaves[_cur-1].end;
+        _leaves[_cur].end = pow(((double)i+1)*(1.0/((double)entries)), gammaf);
         _leaves[_cur].has_val = true;
         _cur++;
     }
@@ -20,15 +21,14 @@ GammaLookupTree::GammaLookupTree(double gammaf, int entries) {
     
     while(true) {
         int this_count = children_count/2;
-        // stuff
         
         for(int i = 0; i<this_count; i++) {
             TreeNode* c1 = &children[2*i];
             TreeNode* c2 = &children[2*i+1];
             
-            double midpoint = (c1->key + c2->key)/2;
-            
-            _leaves[_cur].key = midpoint;
+            _leaves[_cur].start = c1->start;
+            _leaves[_cur].end = c2->end;
+            _leaves[_cur].split = c1->end;
             _leaves[_cur].child_a = c1;
             _leaves[_cur].child_b = c2;
             _leaves[_cur].has_val = false;
@@ -39,7 +39,6 @@ GammaLookupTree::GammaLookupTree(double gammaf, int entries) {
         children += children_count;
         children_count = this_count;
         
-        // 
         if(this_count == 1) {
             break;
         }
@@ -52,10 +51,10 @@ GammaLookupTree::~GammaLookupTree() {
     delete _leaves;
 }
 
-double GammaLookupTree::get(double index) {
+unsigned int GammaLookupTree::get(double index) {
     TreeNode* node = _root;
     while(node->has_val == false) {
-        if(index >= node->key) {
+        if(index >= node->split) {
             node = node->child_b;
         } else {
             node = node->child_a;

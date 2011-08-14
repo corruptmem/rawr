@@ -3,8 +3,11 @@
 
 class TreeNode {
 public:
-    double key;
-    double val;
+    double start;
+    double split;
+    double end;
+    
+    int val;
     TreeNode* child_a;
     TreeNode* child_b;
     bool has_val;
@@ -20,7 +23,7 @@ public:
     GammaLookupTree(double gammaf, int entries);
     ~GammaLookupTree();
     
-    double get(double index);
+    unsigned int get(double index);
 };
 
 

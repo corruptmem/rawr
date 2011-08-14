@@ -51,8 +51,7 @@ int main (int argc, const char * argv[])
             
             // -- gamma --
             
-            double gamma_corrected = glt.get(scaled_val);
-            unsigned int scaled_val_i = gamma_corrected*255.0;
+            unsigned int scaled_val_i = glt.get(scaled_val);
             
             // -- // gamma -- 
             
