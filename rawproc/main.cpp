@@ -117,10 +117,7 @@ public:
         Cr2Slices slices;
         file.seekg(slice_info_offset, std::ios_base::beg);
         file.read((char*)&slices, sizeof(Cr2Slices));
-        
-        //char* raw_buf = new char[strip_byte_counts];
         file.seekg(strip_offset, std::ios_base::beg);
-        //file.read(raw_buf, strip_byte_counts);
         
         ljpeg jp(file);
         //----------
@@ -134,24 +131,20 @@ public:
         int j_w = jp.get_width();
         int j_c = 4;
         
-        //uint16_t* raw_px = new uint16_t[j_h*j_w*j_c];
-        
-        
         double* pixels = new double[w*h];
         
         double exposure = 0.025;
         double aperture = 9;
         double sensitivity = 100;
         double ev = log2(pow(aperture,2))-log2(exposure)-log2(sensitivity/100);
+        double kev = pow(2,ev);
         
         int next = 0;
-        double min_ev = 100;
-        double max_ev = -100;
+        double min_val = 100000;
+        double max_val = 0;
         
         for(int jrow = 0; jrow<j_h; jrow++) {
             rp = jp.row();
-            
-            
             
             for(int px_c = 0; px_c < j_w*j_c; px_c++) {
                 int strip_num = next / (h * slices.first_strip_px);
@@ -176,95 +169,65 @@ public:
                     break;
                 }
                 
-                //pixels[pxpos] = rp[px_c];
                 double pxv = rp[px_c];
                 double px = pxv-2048 < 1 ? 1 : pxv-2048;
-                double pxev = log2(px/1000);
-                double tev = ev+pxev;
-                double val = pow(2,tev);
+                double val = kev*(px/1000);
                 
-                if(tev < min_ev) min_ev = tev;
-                if(tev > max_ev) max_ev = tev;
+                if(val < min_val) min_val = val;
+                if(val > max_val) max_val = val;
                 
                 pixels[pxpos] = val;
                 
                 next++;
-                 
             }
         }
-
-
         
-        double min_val = pow(2, min_ev);
-        double max_val = pow(2, max_ev);
+        // create glut
+        
+        double glut_idx[256];
+        double glut_val[256];
+        double gammaf = (1.0/0.45);
+        for(int i = 0; i < 256; i++) {
+            glut_val[i] = ((double)i)*(1.0/256.0);
+            glut_idx[i] = pow(glut_val[i], gammaf);
+        }
         
         std::ofstream out("/tmp/out.pgm");
         out<<"P5"<<std::endl;
         out<<w<<std::endl;
         out<<h<<std::endl;
-        //out<<"65535"<<std::endl;
         out<<"255"<<std::endl;
-        
-       // min_val = 0;
-       // max_val = 15;
-        
-        std::cout<<"ev="<<ev<<std::endl;
-     //   std::cout<<"lev="<<low_tev<<std::endl;
-        std::cout<<"min_val="<<min_val<<std::endl;
-        std::cout<<"max_val="<<max_val<<std::endl;
-        
-        BigInteger evcounter(0);
-        int evcounter_i = 0;
         
         for(int i = 0; i<w*h; i++) {
             double val = pixels[i];
             
-            //double scaled_val = ((val-min_val)/(max_val-min_val))*(2^0xFFFF);
             double scaled_val = ((val-min_val)/(max_val-min_val));
             if(scaled_val < 0) scaled_val = 0;
             if(scaled_val > 1) scaled_val = 1;
-            double gamma_corrected = pow(scaled_val,0.45);
+            //double gamma_corrected = pow(scaled_val,0.45);
+            //unsigned int scaled_val_i = gamma_corrected*255.0;
             
-            // clams!
-
+            // -- gamma --
+            
+            int j;
+            for(j = 0; j<256; j++) {
+                if(scaled_val < glut_idx[j]) {
+                    break;
+                }
+            }
+            
+            double gamma_corrected = glut_val[j];
+            
+            
             
             unsigned int scaled_val_i = gamma_corrected*255.0;
             
-            evcounter += scaled_val_i;
-            evcounter_i++;
+            // -- // gamma -- 
             
-            //unsigned char c1;
-            unsigned char c2;
-            
-            c2 = (unsigned char)(scaled_val_i & 0xFF);
-            //c1 = (unsigned char)((scaled_val_i & 0xFF00)>>8);
-            
-            //out.put(c1);
-            out.put(c2);
+            out.put((unsigned char)(scaled_val_i & 0xFF));
         }
         
         out.close();
-        
-        std::cout << (evcounter / evcounter_i )<<std::endl;
-    /*
-        std::ofstream out("/tmp/out.pgm");
-        out<<"P5"<<std::endl;
-        out<<w<<std::endl;
-        out<<h<<std::endl;
-        out<<"65535"<<std::endl;
-        
-        for(int i = 0; i<w*h; i++) {
-            unsigned char c1;
-            unsigned char c2;
-            
-            c2 = (unsigned char)(pixels[i] & 0xFF);
-            c1 = (unsigned char)((pixels[i] & 0xFF00)>>8);
-            
-            out.put(c1);
-            out.put(c2);
-        }
-        
-        out.close();*/
         
         std::cout << "Done"  << std::endl;
     }
