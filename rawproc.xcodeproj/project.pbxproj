@@ -8,21 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		7EB8427413E871020030F035 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8427313E871020030F035 /* main.cpp */; };
-		7EB8427613E871020030F035 /* rawproc.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EB8427513E871020030F035 /* rawproc.1 */; };
 		7EB8428113E88E4A0030F035 /* LJpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8428013E88E4A0030F035 /* LJpeg.cpp */; };
 		7EC4259C13F84FAF00091101 /* Cr2Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */; };
+		7EC4259F13F8521400091101 /* _MG_2016.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EC4259D13F851E800091101 /* _MG_2016.CR2 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7EB8426D13E871020030F035 /* CopyFiles */ = {
+		7EC4259E13F8520900091101 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
-				7EB8427613E871020030F035 /* rawproc.1 in CopyFiles */,
+				7EC4259F13F8521400091101 /* _MG_2016.CR2 in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -30,10 +30,10 @@
 		7E74327F13F84C1B009A7BED /* Cr2Reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cr2Reader.h; sourceTree = "<group>"; };
 		7EB8426F13E871020030F035 /* rawproc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rawproc; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EB8427313E871020030F035 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		7EB8427513E871020030F035 /* rawproc.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = rawproc.1; sourceTree = "<group>"; };
 		7EB8428013E88E4A0030F035 /* LJpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LJpeg.cpp; sourceTree = "<group>"; };
 		7EB8428213E895530030F035 /* LJpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LJpeg.h; sourceTree = "<group>"; };
 		7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cr2Reader.cpp; sourceTree = "<group>"; };
+		7EC4259D13F851E800091101 /* _MG_2016.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2016.CR2; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +50,7 @@
 		7EB8426413E871020030F035 = {
 			isa = PBXGroup;
 			children = (
+				7EC4259D13F851E800091101 /* _MG_2016.CR2 */,
 				7EB8427213E871020030F035 /* rawproc */,
 				7EB8427013E871020030F035 /* Products */,
 			);
@@ -67,7 +68,6 @@
 			isa = PBXGroup;
 			children = (
 				7EB8427313E871020030F035 /* main.cpp */,
-				7EB8427513E871020030F035 /* rawproc.1 */,
 				7EB8428013E88E4A0030F035 /* LJpeg.cpp */,
 				7EB8428213E895530030F035 /* LJpeg.h */,
 				7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */,
@@ -85,7 +85,7 @@
 			buildPhases = (
 				7EB8426B13E871020030F035 /* Sources */,
 				7EB8426C13E871020030F035 /* Frameworks */,
-				7EB8426D13E871020030F035 /* CopyFiles */,
+				7EC4259E13F8520900091101 /* CopyFiles */,
 			);
 			buildRules = (
 			);

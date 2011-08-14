@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <unistd.h>
 
 #include "Cr2Reader.h"
 
@@ -9,7 +10,7 @@ int main (int argc, const char * argv[])
     std::cout << "Start"  << std::endl;
     
     try {
-        const char* file_path = "/Users/cameron/Pictures/Aperture Library.aplibrary/Masters/2011/08/09/20110809-211100/_MG_2038.CR2";
+        const char* file_path = "./_MG_2016.CR2";
         //const char* file_path = "/Users/cameron/Pictures/2011_08_09/_MG_2102.CR2";
         
         Cr2Reader parser(file_path);
