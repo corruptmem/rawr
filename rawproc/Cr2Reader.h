@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include "jpeg.h"
+#include "LJpeg.h"
 
 #ifndef rawproc_Cr2Reader_h
 #define rawproc_Cr2Reader_h

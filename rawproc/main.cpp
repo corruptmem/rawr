@@ -4,9 +4,6 @@
 
 #include "Cr2Reader.h"
 
-#include "BigInteger.hh"
-#include "BigIntegerUtils.hh"
-
 int main (int argc, const char * argv[])
 {
     std::cout << "Start"  << std::endl;
@@ -17,7 +14,6 @@ int main (int argc, const char * argv[])
         
         Cr2Reader parser(file_path);
         RawSensel* pixels = parser.Process();
-        
         
         int w = parser.get_width();
         int h = parser.get_height();

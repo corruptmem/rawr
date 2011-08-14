@@ -219,7 +219,7 @@ RawSensel* Cr2Reader::Process() {
     
     _file.seekg(_raw_ptr, std::ios_base::beg);
     
-    ljpeg jp(_file);
+    LJpeg jp(_file);
     //----------
     
     unsigned short *rp;
