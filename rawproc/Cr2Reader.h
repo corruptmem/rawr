@@ -47,9 +47,6 @@ public:
     int get_width();
     int get_height();
     
-    double get_min_val();
-    double get_max_val();
-    
     void Parse();
     RawSensel* Process();
 };

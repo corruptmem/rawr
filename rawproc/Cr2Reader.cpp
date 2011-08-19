@@ -133,19 +133,11 @@ Cr2Reader::Cr2Reader(const char* path) :
 }
 
 int Cr2Reader::get_width() {
-    return _sensor_width;
+    return _sensor_right_border - _sensor_left_border;
 }
 
 int Cr2Reader::get_height() {
-    return _sensor_height;
-}
-
-double Cr2Reader::get_min_val() {
-    return _min_val;
-}
-
-double Cr2Reader::get_max_val() {
-    return _max_val;
+    return _sensor_bottom_border - _sensor_top_border;
 }
 
 void Cr2Reader::Parse() {
@@ -324,14 +316,17 @@ RawSensel* Cr2Reader::Process() {
     
     unsigned short *rp;
     
-    int h = _sensor_height;
-    int w = _sensor_width;
+    int h = _sensor_height;//;
+    int w = _sensor_width; //
+    
+    int t_h = _sensor_bottom_border - _sensor_top_border;
+    int t_w = _sensor_right_border - _sensor_left_border;
     
     int j_h = jp.get_height();
     int j_w = jp.get_width();
     int j_c = 4;
     
-    RawSensel* pixels = new RawSensel[w*h];
+    RawSensel* pixels = new RawSensel[t_w*t_h];
     
     double exposure = _exposure_time;
     double aperture = _f_number;
@@ -364,23 +359,23 @@ RawSensel* Cr2Reader::Process() {
                 x = this_count % _last_strip_px + _first_strip_px*strip_num;
             }
             
-            int pxpos = y*w + x;
+            next++;
             
-            if(pxpos > w*h || pxpos < 0) {
-                break;
+            y -= _sensor_top_border;
+            x -= _sensor_left_border;
+            
+            if(y>=t_h || x>=t_w || x<0 || y<0) {
+                continue;
             }
+            
+            int pxpos = y*t_w + x;
             
             unsigned short pxv = rp[px_c];
             unsigned short  px = pxv-2048 < 1 ? 1 : pxv-2048;
             double val = kev*(((double)px)/1000);
             
-            if(val < _min_val) _min_val = val;
-            if(val > _max_val) _max_val = val;
-            
             pixels[pxpos].val = val;
             pixels[pxpos].prob = _base_probs[px] / (sensitivity/100);
-            
-            next++;
         }
         
     }
