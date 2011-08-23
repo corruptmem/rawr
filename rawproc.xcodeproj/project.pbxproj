@@ -7,31 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7EB14A45140077B50007C2D8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB14A44140077B50007C2D8 /* main.cpp */; };
 		7EB8427413E871020030F035 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8427313E871020030F035 /* main.cpp */; };
 		7EB8428113E88E4A0030F035 /* LJpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EB8428013E88E4A0030F035 /* LJpeg.cpp */; };
 		7EC4259C13F84FAF00091101 /* Cr2Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */; };
-		7EC4259F13F8521400091101 /* _MG_2016.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EC4259D13F851E800091101 /* _MG_2016.CR2 */; };
 		7EC425A313F852ED00091101 /* GammaLookupTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7EC425A213F852ED00091101 /* GammaLookupTree.cpp */; };
-		7EE57CAD13FDF57D00D53125 /* _MG_2086.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EE57CAC13FDF55500D53125 /* _MG_2086.CR2 */; };
-		7EE57CAE13FDF57D00D53125 /* _MG_2084.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EE57CAA13FDF54B00D53125 /* _MG_2084.CR2 */; };
-		7EE57CB013FDFAC400D53125 /* _MG_2089.CR2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EE57CAF13FDFABF00D53125 /* _MG_2089.CR2 */; };
-		7EE57CB213FEDEC300D53125 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EE57CB113FEDEC300D53125 /* OpenCL.framework */; };
-		7EE57CB813FEDF5500D53125 /* blur.cl in Sources */ = {isa = PBXBuildFile; fileRef = 7EE57CB713FEDF5500D53125 /* blur.cl */; };
-		7EE57CBA13FEEECF00D53125 /* blur.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EE57CB713FEDF5500D53125 /* blur.cl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7EB14A3F140077B50007C2D8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		7EC4259E13F8520900091101 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				7EE57CBA13FEEECF00D53125 /* blur.cl in CopyFiles */,
-				7EE57CB013FDFAC400D53125 /* _MG_2089.CR2 in CopyFiles */,
-				7EE57CAD13FDF57D00D53125 /* _MG_2086.CR2 in CopyFiles */,
-				7EE57CAE13FDF57D00D53125 /* _MG_2084.CR2 in CopyFiles */,
-				7EC4259F13F8521400091101 /* _MG_2016.CR2 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -39,43 +37,48 @@
 
 /* Begin PBXFileReference section */
 		7E74327F13F84C1B009A7BED /* Cr2Reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cr2Reader.h; sourceTree = "<group>"; };
+		7EB14A41140077B50007C2D8 /* mosaictest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mosaictest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EB14A44140077B50007C2D8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7EB8426F13E871020030F035 /* rawproc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rawproc; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EB8427313E871020030F035 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7EB8428013E88E4A0030F035 /* LJpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LJpeg.cpp; sourceTree = "<group>"; };
 		7EB8428213E895530030F035 /* LJpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LJpeg.h; sourceTree = "<group>"; };
 		7EC4259B13F84FAF00091101 /* Cr2Reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cr2Reader.cpp; sourceTree = "<group>"; };
-		7EC4259D13F851E800091101 /* _MG_2016.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2016.CR2; sourceTree = "<group>"; };
 		7EC425A213F852ED00091101 /* GammaLookupTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GammaLookupTree.cpp; sourceTree = "<group>"; };
 		7EC425A413F852FC00091101 /* GammaLookupTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GammaLookupTree.h; sourceTree = "<group>"; };
-		7EE57CAA13FDF54B00D53125 /* _MG_2084.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2084.CR2; sourceTree = "<group>"; };
-		7EE57CAC13FDF55500D53125 /* _MG_2086.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2086.CR2; sourceTree = "<group>"; };
-		7EE57CAF13FDFABF00D53125 /* _MG_2089.CR2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = _MG_2089.CR2; sourceTree = "<group>"; };
-		7EE57CB113FEDEC300D53125 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
-		7EE57CB713FEDF5500D53125 /* blur.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = blur.cl; sourceTree = "<group>"; };
-		7EE57CB913FEE2AC00D53125 /* cl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cl.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7EB14A3E140077B50007C2D8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7EB8426C13E871020030F035 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EE57CB213FEDEC300D53125 /* OpenCL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7EB14A43140077B50007C2D8 /* mosaictest */ = {
+			isa = PBXGroup;
+			children = (
+				7EB14A44140077B50007C2D8 /* main.cpp */,
+			);
+			path = mosaictest;
+			sourceTree = "<group>";
+		};
 		7EB8426413E871020030F035 = {
 			isa = PBXGroup;
 			children = (
-				7EE57CB113FEDEC300D53125 /* OpenCL.framework */,
-				7EE57CAF13FDFABF00D53125 /* _MG_2089.CR2 */,
-				7EE57CAC13FDF55500D53125 /* _MG_2086.CR2 */,
-				7EE57CAA13FDF54B00D53125 /* _MG_2084.CR2 */,
-				7EC4259D13F851E800091101 /* _MG_2016.CR2 */,
 				7EB8427213E871020030F035 /* rawproc */,
+				7EB14A43140077B50007C2D8 /* mosaictest */,
 				7EB8427013E871020030F035 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				7EB8426F13E871020030F035 /* rawproc */,
+				7EB14A41140077B50007C2D8 /* mosaictest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,8 +102,6 @@
 				7E74327F13F84C1B009A7BED /* Cr2Reader.h */,
 				7EC425A213F852ED00091101 /* GammaLookupTree.cpp */,
 				7EC425A413F852FC00091101 /* GammaLookupTree.h */,
-				7EE57CB713FEDF5500D53125 /* blur.cl */,
-				7EE57CB913FEE2AC00D53125 /* cl.hpp */,
 			);
 			path = rawproc;
 			sourceTree = "<group>";
@@ -107,6 +109,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7EB14A40140077B50007C2D8 /* mosaictest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EB14A48140077B50007C2D8 /* Build configuration list for PBXNativeTarget "mosaictest" */;
+			buildPhases = (
+				7EB14A3D140077B50007C2D8 /* Sources */,
+				7EB14A3E140077B50007C2D8 /* Frameworks */,
+				7EB14A3F140077B50007C2D8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mosaictest;
+			productName = mosaictest;
+			productReference = 7EB14A41140077B50007C2D8 /* mosaictest */;
+			productType = "com.apple.product-type.tool";
+		};
 		7EB8426E13E871020030F035 /* rawproc */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7EB8427913E871020030F035 /* Build configuration list for PBXNativeTarget "rawproc" */;
@@ -145,11 +164,20 @@
 			projectRoot = "";
 			targets = (
 				7EB8426E13E871020030F035 /* rawproc */,
+				7EB14A40140077B50007C2D8 /* mosaictest */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7EB14A3D140077B50007C2D8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EB14A45140077B50007C2D8 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7EB8426B13E871020030F035 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -158,13 +186,26 @@
 				7EB8428113E88E4A0030F035 /* LJpeg.cpp in Sources */,
 				7EC4259C13F84FAF00091101 /* Cr2Reader.cpp in Sources */,
 				7EC425A313F852ED00091101 /* GammaLookupTree.cpp in Sources */,
-				7EE57CB813FEDF5500D53125 /* blur.cl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		7EB14A49140077B50007C2D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7EB14A4A140077B50007C2D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		7EB8427713E871020030F035 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -233,6 +274,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7EB14A48140077B50007C2D8 /* Build configuration list for PBXNativeTarget "mosaictest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EB14A49140077B50007C2D8 /* Debug */,
+				7EB14A4A140077B50007C2D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		7EB8426913E871020030F035 /* Build configuration list for PBXProject "rawproc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
